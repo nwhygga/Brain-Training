@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Нейро-Атлет | Тренажер мозга</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>NeuroFlex | Нейро-Тренажер</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0b0f19; color: #f3f4f6; touch-action: manipulation; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
         .tap-highlight { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between p-4 tap-highlight select-none">
+<body class="min-h-screen flex flex-col items-center justify-between p-4 tap-highlight">
 
-    <div class="w-full max-w-md bg-gray-900/90 backdrop-blur-xl border border-gray-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-5">
+    <!-- Главный контейнер -->
+    <div class="w-full max-w-md bg-gray-900/90 backdrop-blur-xl border border-gray-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-5 my-auto">
         
         <!-- Шапка профиля -->
         <div class="flex items-center justify-between bg-gray-800/60 p-3.5 rounded-2xl border border-gray-700/50">
             <div class="flex items-center gap-3">
-                <div id="user-avatar" class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">Н</div>
+                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">Н</div>
                 <div>
-                    <h2 id="user-name" class="font-bold text-base text-white">Нейро-Атлет</h2>
-                    <span id="sync-status" class="text-xs text-indigo-400 font-medium">Ready</span>
+                    <h2 class="font-bold text-base text-white">Нейро-Атлет</h2>
+                    <span class="text-xs text-indigo-400 font-medium">NeuroFlex v2.0</span>
                 </div>
             </div>
             <div class="text-right">
@@ -31,7 +38,7 @@
             </div>
         </div>
 
-        <!-- Прогресс -->
+        <!-- Статистика -->
         <div class="grid grid-cols-3 gap-2 text-center">
             <div class="bg-gray-800/60 p-3 rounded-2xl border border-gray-700/50">
                 <div class="text-xs text-gray-400 mb-1">Уровень</div>
@@ -47,45 +54,45 @@
             </div>
         </div>
 
-        <!-- Вкладки -->
+        <!-- Переключатель вкладок -->
         <div class="flex bg-gray-800/80 p-1.5 rounded-2xl gap-1 border border-gray-700/50">
             <button onclick="switchTab('games')" id="btn-tab-games" class="flex-1 py-2 text-sm font-semibold rounded-xl bg-indigo-600 text-white shadow transition-all">Игры</button>
             <button onclick="switchTab('analytics')" id="btn-tab-analytics" class="flex-1 py-2 text-sm font-semibold rounded-xl text-gray-400 hover:text-white transition-all">Аналитика</button>
         </div>
 
-        <!-- Список Игр -->
+        <!-- Меню Игр -->
         <div id="view-games" class="flex flex-col gap-3">
             <div onclick="startStruop()" class="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-indigo-500/30 p-4 rounded-2xl cursor-pointer hover:border-indigo-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Тест Струпа</h3>
-                <p class="text-xs text-gray-300 mt-1">Гибкость мышления & контроль реакций</p>
+                <p class="text-xs text-gray-300 mt-1">Гибкость мышления & когнитивный контроль</p>
             </div>
             <div onclick="startMemory()" class="bg-gradient-to-r from-purple-900/40 to-pink-900/40 border border-purple-500/30 p-4 rounded-2xl cursor-pointer hover:border-purple-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Матрица Памяти (3x3 ➔ 7x7)</h3>
-                <p class="text-xs text-gray-300 mt-1">Прогрессия с откатами при ошибках</p>
+                <p class="text-xs text-gray-300 mt-1">3 жизни, поочередный порядок & откат уровней</p>
             </div>
             <div onclick="startReaction()" class="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-500/30 p-4 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Быстрая Реакция</h3>
-                <p class="text-xs text-gray-300 mt-1">Скорость реакции & выбор цели</p>
+                <p class="text-xs text-gray-300 mt-1">Скорость обработки информации & отклик</p>
             </div>
             <div onclick="startMath()" class="bg-gradient-to-r from-amber-900/40 to-orange-900/40 border border-amber-500/30 p-4 rounded-2xl cursor-pointer hover:border-amber-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Математический Спринт</h3>
-                <p class="text-xs text-gray-300 mt-1">Устный счет & фокус под давлением</p>
+                <p class="text-xs text-gray-300 mt-1">Скорость вычислений & концентрация</p>
             </div>
         </div>
 
-        <!-- Аналитика -->
+        <!-- Раздел Аналитики -->
         <div id="view-analytics" class="hidden flex flex-col gap-3">
             <div class="bg-gray-800/60 p-4 rounded-2xl border border-gray-700/50">
-                <h4 class="font-bold text-white mb-2 text-sm">История тренировок</h4>
+                <h4 class="font-bold text-white mb-2 text-sm">История сессий</h4>
                 <div id="history-list" class="flex flex-col gap-2 max-h-60 overflow-y-auto text-xs text-gray-300">
-                    <p class="text-gray-500 text-center py-4">Пока нет тренировок. Сыграй в первую игру!</p>
+                    <p class="text-gray-500 text-center py-4">История пуста. Пройди первую тренировку!</p>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Модальное окно игры -->
+    <!-- Модальное окно для игрового процесса -->
     <div id="game-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
         <div class="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-3xl p-6 flex flex-col items-center text-center relative shadow-2xl">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold p-2">✕</button>
@@ -94,37 +101,21 @@
     </div>
 
     <script>
-        let tg = window.Telegram?.WebApp;
+        // --- 1. ГЛОБАЛЬНОЕ СОСТОЯНИЕ И СОХРАНЕНИЕ ---
         let userData = { xp: 0, level: 1, streak: 1, history: [] };
 
-        // Инициализация при старте
-        try {
-            if (tg) {
-                tg.ready();
-                tg.expand();
-                if (tg.initDataUnsafe?.user) {
-                    let user = tg.initDataUnsafe.user;
-                    document.getElementById('user-name').innerText = user.first_name || 'Нейро-Атлет';
-                    if (user.photo_url) {
-                        document.getElementById('user-avatar').innerHTML = `<img src="${user.photo_url}" class="w-full h-full rounded-full object-cover">`;
-                    }
-                }
-            }
-        } catch(e) {}
-
-        let saved = localStorage.getItem('neuro_flex_data');
-        if (saved) {
-            try { userData = JSON.parse(saved); } catch(e) {}
-        }
-        updateUI();
-
-        function saveData() {
+        function loadUserData() {
             try {
-                localStorage.setItem('neuro_flex_data', JSON.stringify(userData));
-                if (tg && tg.CloudStorage) {
-                    tg.CloudStorage.setItem('neuro_flex_data', JSON.stringify(userData));
-                }
-            } catch(e) {}
+                let saved = localStorage.getItem('neuroflex_save_data');
+                if (saved) userData = JSON.parse(saved);
+            } catch (e) {}
+            updateUI();
+        }
+
+        function saveUserData() {
+            try {
+                localStorage.setItem('neuroflex_save_data', JSON.stringify(userData));
+            } catch (e) {}
         }
 
         function updateUI() {
@@ -136,17 +127,19 @@
             if (userData.level >= 3) rank = 'Адепт';
             if (userData.level >= 5) rank = 'Эксперт';
             if (userData.level >= 8) rank = 'Мастер';
+            if (userData.level >= 12) rank = 'Грандмастер';
             document.getElementById('user-rank').innerText = rank;
 
             let histHTML = '';
             if (!userData.history || userData.history.length === 0) {
-                histHTML = '<p class="text-gray-500 text-center py-4">Пока нет тренировок. Сыграй в первую игру!</p>';
+                histHTML = '<p class="text-gray-500 text-center py-4">История пуста. Пройди первую тренировку!</p>';
             } else {
                 userData.history.slice(-10).reverse().forEach(h => {
-                    histHTML += `<div class="flex justify-between items-center bg-gray-900/60 p-2.5 rounded-xl border border-gray-800">
-                        <span class="font-medium text-white">${h.game}</span>
-                        <span class="text-indigo-400 font-bold">+${h.xp} XP (${h.score} очков)</span>
-                    </div>`;
+                    histHTML += `
+                        <div class="flex justify-between items-center bg-gray-900/60 p-2.5 rounded-xl border border-gray-800">
+                            <span class="font-medium text-white">${h.game}</span>
+                            <span class="text-indigo-400 font-bold">+${h.xp} XP (${h.score} очк.)</span>
+                        </div>`;
                 });
             }
             document.getElementById('history-list').innerHTML = histHTML;
@@ -166,16 +159,13 @@
             }
         }
 
-        function addScore(gameName, score, xp) {
+        function addXP(gameName, score, xp) {
             userData.xp += xp;
             userData.level = Math.floor(userData.xp / 100) + 1;
             if (!userData.history) userData.history = [];
             userData.history.push({ game: gameName, score: score, xp: xp, date: new Date().toLocaleDateString() });
-            saveData();
+            saveUserData();
             updateUI();
-            if (tg && tg.HapticFeedback) {
-                try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-            }
         }
 
         function closeModal() {
@@ -186,9 +176,9 @@
             return `<button onclick="closeModal()" class="w-full mt-3 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-2xl font-semibold text-gray-300 text-xs transition-all">🚪 Выход в меню</button>`;
         }
 
-        // 1. Тест Струпа
-        let struopData = { score: 0, rounds: 0, targetColor: '' };
-        const colors = [
+        // --- 2. ИГРА 1: ТЕСТ СТРУПА ---
+        let struopState = { score: 0, round: 0, colorCode: '' };
+        const colorPalette = [
             { name: 'КРАСНЫЙ', code: '#ef4444' },
             { name: 'СИНИЙ', code: '#3b82f6' },
             { name: 'ЗЕЛЕНЫЙ', code: '#22c55e' },
@@ -196,74 +186,87 @@
         ];
 
         function startStruop() {
-            struopData = { score: 0, rounds: 0, targetColor: '' };
+            struopState = { score: 0, round: 0, colorCode: '' };
             document.getElementById('game-modal').classList.remove('hidden');
-            nextStruopRound();
+            renderStruopRound();
         }
 
-        function nextStruopRound() {
-            if (struopData.rounds >= 10) {
-                let xp = struopData.score * 5;
-                addScore('Тест Струпа', struopData.score, xp);
+        function renderStruopRound() {
+            if (struopState.round >= 10) {
+                let xp = struopState.score * 5;
+                addXP('Тест Струпа', struopState.score, xp);
                 document.getElementById('game-container').innerHTML = `
-                    <h3 class="text-2xl font-bold text-white mb-2">Отлично!</h3>
-                    <p class="text-gray-400 mb-4">Счет: ${struopData.score}/10 | Награда: +${xp} XP</p>
+                    <h3 class="text-2xl font-bold text-white mb-2">Раунд окончен!</h3>
+                    <p class="text-gray-400 mb-4">Счет: ${struopState.score}/10 | Награда: +${xp} XP</p>
                     <button onclick="closeModal()" class="w-full py-3 bg-indigo-600 rounded-2xl font-bold text-white">Завершить</button>
                 `;
                 return;
             }
-            let wordObj = colors[Math.floor(Math.random() * colors.length)];
-            let colorObj = colors[Math.floor(Math.random() * colors.length)];
-            struopData.targetColor = colorObj.code;
+
+            let wordObj = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            let colorObj = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            struopState.colorCode = colorObj.code;
 
             document.getElementById('game-container').innerHTML = `
-                <div class="text-xs text-gray-400 mb-2">Раунд ${struopData.rounds + 1} / 10</div>
-                <div class="text-xs font-semibold text-indigo-400 mb-4">Выбери цвет текста:</div>
-                <div class="text-3xl font-black mb-8" style="color: ${colorObj.code}">${wordObj.name}</div>
+                <div class="text-xs text-gray-400 mb-2">Раунд ${struopState.round + 1} из 10</div>
+                <div class="text-xs font-semibold text-indigo-400 mb-4">Выбери цвет текста, а не слово:</div>
+                <div class="text-3xl font-black mb-8 tracking-wide" style="color: ${colorObj.code}">${wordObj.name}</div>
                 <div class="grid grid-cols-2 gap-3 w-full">
-                    <button onclick="checkStruop('#ef4444')" class="py-3 bg-red-600/30 border border-red-500 rounded-2xl font-bold text-red-400">Красный</button>
-                    <button onclick="checkStruop('#3b82f6')" class="py-3 bg-blue-600/30 border border-blue-500 rounded-2xl font-bold text-blue-400">Синий</button>
-                    <button onclick="checkStruop('#22c55e')" class="py-3 bg-emerald-600/30 border border-emerald-500 rounded-2xl font-bold text-emerald-400">Зеленый</button>
-                    <button onclick="checkStruop('#eab308')" class="py-3 bg-amber-600/30 border border-amber-500 rounded-2xl font-bold text-amber-400">Желтый</button>
+                    <button onclick="answerStruop('#ef4444')" class="py-3 bg-red-600/20 border border-red-500 rounded-2xl font-bold text-red-400 active:scale-95 transition-all">Красный</button>
+                    <button onclick="answerStruop('#3b82f6')" class="py-3 bg-blue-600/20 border border-blue-500 rounded-2xl font-bold text-blue-400 active:scale-95 transition-all">Синий</button>
+                    <button onclick="answerStruop('#22c55e')" class="py-3 bg-emerald-600/20 border border-emerald-500 rounded-2xl font-bold text-emerald-400 active:scale-95 transition-all">Зеленый</button>
+                    <button onclick="answerStruop('#eab308')" class="py-3 bg-amber-600/20 border border-amber-500 rounded-2xl font-bold text-amber-400 active:scale-95 transition-all">Желтый</button>
                 </div>
                 ${getExitButtonHTML()}
             `;
         }
 
-        function checkStruop(color) {
-            if (color === struopData.targetColor) struopData.score++;
-            struopData.rounds++;
-            nextStruopRound();
+        function answerStruop(selectedCode) {
+            if (selectedCode === struopState.colorCode) struopState.score++;
+            struopState.round++;
+            renderStruopRound();
         }
 
-        // 2. Матрица Памяти (3x3 ➔ 7x7 с 3 жизнями и откатом)
-        let memData = { pattern: [], step: 0, size: 3, count: 3, score: 0, level: 1, lives: 3, isShowing: false, activeCell: null };
-        
+        // --- 3. ИГРА 2: МАТРИЦА ПАМЯТИ (3x3 -> 7x7, 3 ЖИЗНИ, ОТКАТ) ---
+        let memState = {
+            pattern: [],
+            step: 0,
+            size: 3,
+            count: 3,
+            score: 0,
+            level: 1,
+            lives: 3,
+            isShowing: false,
+            activeCell: null
+        };
+
         function startMemory() {
-            memData = { pattern: [], step: 0, size: 3, count: 3, score: 0, level: 1, lives: 3, isShowing: false, activeCell: null };
+            memState = { pattern: [], step: 0, size: 3, count: 3, score: 0, level: 1, lives: 3, isShowing: false, activeCell: null };
             document.getElementById('game-modal').classList.remove('hidden');
             nextMemoryLevel();
         }
 
         function nextMemoryLevel() {
-            memData.step = 0;
-            memData.pattern = [];
-            memData.isShowing = true;
-            memData.activeCell = null;
+            memState.step = 0;
+            memState.pattern = [];
+            memState.isShowing = true;
+            memState.activeCell = null;
 
-            if (memData.level === 2) { memData.size = 3; memData.count = 4; }
-            else if (memData.level === 3) { memData.size = 4; memData.count = 4; }
-            else if (memData.level === 4) { memData.size = 4; memData.count = 5; }
-            else if (memData.level === 5) { memData.size = 5; memData.count = 5; }
-            else if (memData.level === 6) { memData.size = 5; memData.count = 6; }
-            else if (memData.level === 7) { memData.size = 6; memData.count = 6; }
-            else if (memData.level === 8) { memData.size = 6; memData.count = 7; }
-            else if (memData.level >= 9)  { memData.size = 7; memData.count = 7; }
+            // Динамический прогресс сложности
+            if (memState.level === 1) { memState.size = 3; memState.count = 3; }
+            else if (memState.level === 2) { memState.size = 3; memState.count = 4; }
+            else if (memState.level === 3) { memState.size = 4; memState.count = 4; }
+            else if (memState.level === 4) { memState.size = 4; memState.count = 5; }
+            else if (memState.level === 5) { memState.size = 5; memState.count = 5; }
+            else if (memState.level === 6) { memState.size = 5; memState.count = 6; }
+            else if (memState.level === 7) { memState.size = 6; memState.count = 6; }
+            else if (memState.level === 8) { memState.size = 6; memState.count = 7; }
+            else if (memState.level >= 9)  { memState.size = 7; memState.count = 7; }
 
-            let totalCells = memData.size * memData.size;
-            while(memData.pattern.length < memData.count) {
-                let r = Math.floor(Math.random() * totalCells);
-                if(!memData.pattern.includes(r)) memData.pattern.push(r);
+            let totalCells = memState.size * memState.size;
+            while (memState.pattern.length < memState.count) {
+                let cell = Math.floor(Math.random() * totalCells);
+                if (!memState.pattern.includes(cell)) memState.pattern.push(cell);
             }
 
             renderMemoryGrid();
@@ -271,87 +274,93 @@
         }
 
         function playMemorySequence() {
-            let i = 0;
+            let idx = 0;
             let interval = setInterval(() => {
-                if (i < memData.pattern.length) {
-                    memData.activeCell = memData.pattern[i];
+                if (idx < memState.pattern.length) {
+                    memState.activeCell = memState.pattern[idx];
                     renderMemoryGrid();
                     setTimeout(() => {
-                        memData.activeCell = null;
+                        memState.activeCell = null;
                         renderMemoryGrid();
                     }, 400);
-                    i++;
+                    idx++;
                 } else {
                     clearInterval(interval);
-                    memData.isShowing = false;
+                    memState.isShowing = false;
                     renderMemoryGrid();
                 }
             }, 700);
         }
 
         function renderMemoryGrid() {
-            let gridColsClass = 'grid-cols-3';
-            let cellSize = 'h-20';
-            if (memData.size === 4) { gridColsClass = 'grid-cols-4'; cellSize = 'h-16'; }
-            else if (memData.size === 5) { gridColsClass = 'grid-cols-5'; cellSize = 'h-14'; }
-            else if (memData.size === 6) { gridColsClass = 'grid-cols-6'; cellSize = 'h-12'; }
-            else if (memData.size === 7) { gridColsClass = 'grid-cols-7'; cellSize = 'h-10'; }
+            let gridCols = 'grid-cols-3';
+            let cellHeight = 'h-20';
 
-            let totalCells = memData.size * memData.size;
-            let statusText = memData.isShowing ? "Запоминай..." : `Твой ход (Попыток: ${memData.lives} ❤️)`;
+            if (memState.size === 4) { gridCols = 'grid-cols-4'; cellHeight = 'h-16'; }
+            else if (memState.size === 5) { gridCols = 'grid-cols-5'; cellHeight = 'h-14'; }
+            else if (memState.size === 6) { gridCols = 'grid-cols-6'; cellHeight = 'h-12'; }
+            else if (memState.size === 7) { gridCols = 'grid-cols-7'; cellHeight = 'h-10'; }
 
-            let html = `<div class="text-xs text-indigo-400 font-semibold mb-1">Уровень ${memData.level} (${memData.size}x${memData.size}) | ${statusText}</div>
-                        <div class="grid ${gridColsClass} gap-1.5 w-full max-w-[280px] mb-2">`;
-            
-            for(let i=0; i<totalCells; i++) {
-                let isActive = memData.activeCell === i;
-                let bg = "bg-gray-800 border-gray-700";
-                if (isActive) bg = "bg-indigo-500 border-indigo-300 shadow-lg shadow-indigo-500/50 scale-95";
-                html += `<div onclick="checkMemoryClick(${i})" class="${cellSize} rounded-xl border ${bg} flex items-center justify-center cursor-pointer transition-all"></div>`;
+            let totalCells = memState.size * memState.size;
+            let hearts = '❤️'.repeat(memState.lives);
+            let statusText = memState.isShowing ? "Запоминай..." : `Твой ход (${hearts})`;
+
+            let html = `<div class="text-xs text-indigo-400 font-semibold mb-1">Уровень ${memState.level} (${memState.size}x${memState.size}) | ${statusText}</div>
+                        <div class="grid ${gridCols} gap-1.5 w-full max-w-[280px] mb-2">`;
+
+            for (let i = 0; i < totalCells; i++) {
+                let isActive = memState.activeCell === i;
+                let bgStyle = isActive ? "bg-indigo-500 border-indigo-300 shadow-lg shadow-indigo-500/50 scale-95" : "bg-gray-800 border-gray-700";
+                html += `<div onclick="clickMemoryCell(${i})" class="${cellHeight} rounded-xl border ${bgStyle} flex items-center justify-center cursor-pointer transition-all"></div>`;
             }
+
             html += `</div>${getExitButtonHTML()}`;
             document.getElementById('game-container').innerHTML = html;
         }
 
-        function checkMemoryClick(idx) {
-            if (memData.isShowing) return;
+        function clickMemoryCell(cellIdx) {
+            if (memState.isShowing) return;
 
-            if (idx === memData.pattern[memData.step]) {
-                memData.step++;
-                memData.activeCell = idx;
+            if (cellIdx === memState.pattern[memState.step]) {
+                // Вход верный
+                memState.step++;
+                memState.activeCell = cellIdx;
                 renderMemoryGrid();
                 setTimeout(() => {
-                    memData.activeCell = null;
+                    memState.activeCell = null;
                     renderMemoryGrid();
                 }, 150);
 
-                if (memData.step === memData.pattern.length) {
-                    memData.score += memData.level * 20;
-                    memData.level++;
-                    memData.lives = 3;
+                if (memState.step === memState.pattern.length) {
+                    memState.score += memState.level * 25;
+                    memState.level++;
+                    memState.lives = 3; // сброс жизней на новом уровне
                     setTimeout(nextMemoryLevel, 800);
                 }
             } else {
-                memData.lives--;
-                if (memData.lives > 0) {
-                    memData.isShowing = true;
+                // Ошибка в последовательности
+                memState.lives--;
+                if (memState.lives > 0) {
+                    memState.isShowing = true;
                     renderMemoryGrid();
                     setTimeout(() => {
-                        memData.step = 0;
+                        memState.step = 0;
                         playMemorySequence();
                     }, 600);
                 } else {
-                    memData.isShowing = true;
-                    if (memData.level > 1) {
-                        memData.level--;
+                    // Попытки кончились -> Откат уровня
+                    memState.isShowing = true;
+                    if (memState.level > 1) {
+                        memState.level--;
                     }
-                    memData.lives = 3;
-                    let xp = memData.score * 2;
-                    addScore('Матрица Памяти', memData.score, xp);
+                    memState.lives = 3;
+                    let xp = memState.score * 2;
+                    addXP('Матрица Памяти', memState.score, xp);
+
                     setTimeout(() => {
                         document.getElementById('game-container').innerHTML = `
                             <h3 class="text-2xl font-bold text-white mb-2">Попытки исчерпаны!</h3>
-                            <p class="text-gray-400 mb-2">Произошел откат на уровень ${memData.level}</p>
+                            <p class="text-gray-400 mb-2">Откат на уровень ${memState.level}</p>
                             <p class="text-indigo-400 font-bold mb-4">Награда: +${xp} XP</p>
                             <button onclick="startMemory()" class="w-full py-3 bg-indigo-600 rounded-2xl font-bold text-white mb-2">Попробовать снова</button>
                             ${getExitButtonHTML()}
@@ -361,89 +370,100 @@
             }
         }
 
-        // 3. Быстрая Реакция
-        let reactData = { score: 0, rounds: 0 };
+        // --- 4. ИГРА 3: БЫСТРАЯ РЕАКЦИЯ ---
+        let reactState = { score: 0, round: 0 };
+
         function startReaction() {
-            reactData = { score: 0, rounds: 0 };
+            reactState = { score: 0, round: 0 };
             document.getElementById('game-modal').classList.remove('hidden');
-            nextReactRound();
+            renderReactionRound();
         }
 
-        function nextReactRound() {
-            if (reactData.rounds >= 10) {
-                let xp = reactData.score * 5;
-                addScore('Быстрая Реакция', reactData.score, xp);
+        function renderReactionRound() {
+            if (reactState.round >= 10) {
+                let xp = reactState.score * 5;
+                addXP('Быстрая Реакция', reactState.score, xp);
                 document.getElementById('game-container').innerHTML = `
                     <h3 class="text-2xl font-bold text-white mb-2">Финиш!</h3>
-                    <p class="text-gray-400 mb-4">Счет: ${reactData.score}/10 | Награда: +${xp} XP</p>
+                    <p class="text-gray-400 mb-4">Счет: ${reactState.score}/10 | Награда: +${xp} XP</p>
                     <button onclick="closeModal()" class="w-full py-3 bg-indigo-600 rounded-2xl font-bold text-white">Завершить</button>
                 `;
                 return;
             }
-            let target = Math.floor(Math.random() * 4);
+
+            let targetIdx = Math.floor(Math.random() * 4);
             let isGreen = Math.random() > 0.3;
 
-            let html = `<div class="text-xs text-gray-400 mb-2">Раунд ${reactData.rounds + 1} / 10</div>
-                        <div class="text-xs text-emerald-400 font-semibold mb-4">Жми на ЗЕЛЕНЫЙ блок!</div>
-                        <div class="grid grid-cols-2 gap-3 w-full max-w-[240px] mb-2">`;
-            for(let i=0; i<4; i++) {
-                let bg = (i === target) ? (isGreen ? 'bg-emerald-600 border-emerald-400' : 'bg-red-600 border-red-400') : 'bg-gray-800 border-gray-700';
-                html += `<div onclick="checkReact(${i === target}, ${isGreen})" class="h-24 rounded-2xl border ${bg} cursor-pointer active:scale-95 transition-all"></div>`;
+            let html = `
+                <div class="text-xs text-gray-400 mb-2">Раунд ${reactState.round + 1} из 10</div>
+                <div class="text-xs text-emerald-400 font-semibold mb-4">Жми ТОЛЬКО на ЗЕЛЕНЫЙ блок!</div>
+                <div class="grid grid-cols-2 gap-3 w-full max-w-[240px] mb-2">`;
+
+            for (let i = 0; i < 4; i++) {
+                let bgStyle = (i === targetIdx) ? (isGreen ? 'bg-emerald-600 border-emerald-400' : 'bg-red-600 border-red-400') : 'bg-gray-800 border-gray-700';
+                html += `<div onclick="answerReaction(${i === targetIdx}, ${isGreen})" class="h-24 rounded-2xl border ${bgStyle} cursor-pointer active:scale-95 transition-all"></div>`;
             }
+
             html += `</div>${getExitButtonHTML()}`;
             document.getElementById('game-container').innerHTML = html;
         }
 
-        function checkReact(isTarget, isGreen) {
-            if (isTarget && isGreen) reactData.score++;
-            reactData.rounds++;
-            nextReactRound();
+        function answerReaction(isTarget, isGreen) {
+            if (isTarget && isGreen) reactState.score++;
+            reactState.round++;
+            renderReactionRound();
         }
 
-        // 4. Математический Спринт
-        let mathData = { score: 0, currentAnswer: 0, rounds: 0 };
+        // --- 5. ИГРА 4: МАТЕМАТИЧЕСКИЙ СПРИНТ ---
+        let mathState = { score: 0, correctAnswer: 0, round: 0 };
+
         function startMath() {
-            mathData = { score: 0, rounds: 0, currentAnswer: 0 };
+            mathState = { score: 0, correctAnswer: 0, round: 0 };
             document.getElementById('game-modal').classList.remove('hidden');
-            nextMathRound();
+            renderMathRound();
         }
 
-        function nextMathRound() {
-            if (mathData.rounds >= 10) {
-                let xp = mathData.score * 5;
-                addScore('Математический Спринт', mathData.score, xp);
+        function renderMathRound() {
+            if (mathState.round >= 10) {
+                let xp = mathState.score * 5;
+                addXP('Математический Спринт', mathState.score, xp);
                 document.getElementById('game-container').innerHTML = `
                     <h3 class="text-2xl font-bold text-white mb-2">Спринт окончен!</h3>
-                    <p class="text-gray-400 mb-4">Счет: ${mathData.score}/10 | Награда: +${xp} XP</p>
+                    <p class="text-gray-400 mb-4">Счет: ${mathState.score}/10 | Награда: +${xp} XP</p>
                     <button onclick="closeModal()" class="w-full py-3 bg-indigo-600 rounded-2xl font-bold text-white">Завершить</button>
                 `;
                 return;
             }
+
             let a = Math.floor(Math.random() * 20) + 5;
             let b = Math.floor(Math.random() * 20) + 5;
-            let op = Math.random() > 0.5 ? '+' : '-';
-            if (op === '-' && b > a) { let tmp = a; a = b; b = tmp; }
-            mathData.currentAnswer = op === '+' ? a + b : a - b;
+            let isPlus = Math.random() > 0.5;
 
-            let wrong1 = mathData.currentAnswer + (Math.random() > 0.5 ? 2 : -3);
-            let wrong2 = mathData.currentAnswer + (Math.random() > 0.5 ? 4 : -2);
-            let answers = [mathData.currentAnswer, wrong1, wrong2].sort(() => Math.random() - 0.5);
+            if (!isPlus && b > a) { let tmp = a; a = b; b = tmp; }
+            mathState.correctAnswer = isPlus ? a + b : a - b;
+
+            let wrong1 = mathState.correctAnswer + (Math.random() > 0.5 ? 2 : -3);
+            let wrong2 = mathState.correctAnswer + (Math.random() > 0.5 ? 4 : -2);
+            let options = [mathState.correctAnswer, wrong1, wrong2].sort(() => Math.random() - 0.5);
 
             document.getElementById('game-container').innerHTML = `
-                <div class="text-xs text-gray-400 mb-2">Раунд ${mathData.rounds + 1} / 10</div>
-                <div class="text-3xl font-black text-white mb-6">${a} ${op} ${b} = ?</div>
+                <div class="text-xs text-gray-400 mb-2">Раунд ${mathState.round + 1} из 10</div>
+                <div class="text-3xl font-black text-white mb-6">${a} ${isPlus ? '+' : '-'} ${b} = ?</div>
                 <div class="flex flex-col gap-3 w-full mb-2">
-                    ${answers.map(ans => `<button onclick="checkMath(${ans})" class="py-3 bg-gray-800 border border-gray-700 rounded-2xl font-bold text-white hover:border-indigo-500 active:scale-95 transition-all">${ans}</button>`).join('')}
+                    ${options.map(opt => `<button onclick="answerMath(${opt})" class="py-3 bg-gray-800 border border-gray-700 rounded-2xl font-bold text-white hover:border-indigo-500 active:scale-95 transition-all">${opt}</button>`).join('')}
                 </div>
                 ${getExitButtonHTML()}
             `;
         }
 
-        function checkMath(ans) {
-            if (ans === mathData.currentAnswer) mathData.score++;
-            mathData.rounds++;
-            nextMathRound();
+        function answerMath(selectedOpt) {
+            if (selectedOpt === mathState.correctAnswer) mathState.score++;
+            mathState.round++;
+            renderMathRound();
         }
+
+        // --- 6. ЗАПУСК ИНИЦИАЛИЗАЦИИ ПРИ СТАРТЕ ---
+        loadUserData();
     </script>
 </body>
 </html>
