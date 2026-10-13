@@ -61,7 +61,7 @@
             </div>
             <div id="card-memory" class="bg-gradient-to-r from-purple-900/40 to-pink-900/40 border border-purple-500/30 p-4 rounded-2xl cursor-pointer hover:border-purple-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Матрица Памяти (3x3 ➔ 7x7)</h3>
-                <p class="text-xs text-gray-300 mt-1">Прогрессия с откатамя при ошибках</p>
+                <p class="text-xs text-gray-300 mt-1">Прогрессия с откатами при ошибках</p>
             </div>
             <div id="card-reaction" class="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-500/30 p-4 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Быстрая Реакция</h3>
@@ -202,7 +202,6 @@
             document.getElementById('game-modal').classList.add('hidden');
         }
 
-        // Общая кнопка Выход для интерфейса игры
         function getExitButtonHTML() {
             return `<button onclick="closeModal()" class="w-full mt-3 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-2xl font-semibold text-gray-300 text-xs transition-all">🚪 Выход в меню</button>`;
         }
@@ -261,11 +260,11 @@
         let memData = { 
             pattern: [], 
             step: 0, 
-            size: 3,     // Начинаем с 3х3
-            count: 3,    // Количество точек для запоминания
+            size: 3, 
+            count: 3, 
             score: 0, 
             level: 1, 
-            lives: 3,    // 3 попытки на уровень
+            lives: 3, 
             isShowing: false, 
             activeCell: null 
         };
@@ -282,7 +281,6 @@
             memData.isShowing = true;
             memData.activeCell = null;
 
-            // Динамический размер поля в зависимости от уровня (от 3х3 до 7х7)
             if (memData.level === 2) { memData.size = 3; memData.count = 4; }
             else if (memData.level === 3) { memData.size = 4; memData.count = 4; }
             else if (memData.level === 4) { memData.size = 4; memData.count = 5; }
@@ -322,7 +320,6 @@
         }
 
         function renderMemoryGrid() {
-            // Динамические стили сетки в зависимости от размера
             let gridColsClass = 'grid-cols-3';
             let cellSize = 'h-20';
             if (memData.size === 4) { gridColsClass = 'grid-cols-4'; cellSize = 'h-16'; }
@@ -358,18 +355,15 @@
                     renderMemoryGrid();
                 }, 150);
 
-                // Если прошел последовательность
                 if (memData.step === memData.pattern.length) {
                     memData.score += memData.level * 20;
                     memData.level++;
-                    memData.lives = 3; // сбрасываем попытки для нового уровня
+                    memData.lives = 3;
                     setTimeout(nextMemoryLevel, 800);
                 }
             } else {
-                // Ошибка в последовательности
                 memData.lives--;
                 if (memData.lives > 0) {
-                    // Есть еще попытки — показываем снова ту же последовательность
                     memData.isShowing = true;
                     renderMemoryGrid();
                     setTimeout(() => {
@@ -377,10 +371,9 @@
                         playMemorySequence();
                     }, 600);
                 } else {
-                    // Попытки кончились — ОТКАТ УРОВНЯ НАЗАД
                     memData.isShowing = true;
                     if (memData.level > 1) {
-                        memData.level--; // Откат на предыдущий уровень
+                        memData.level--;
                     }
                     memData.lives = 3;
                     let xp = memData.score * 2;
@@ -427,4 +420,59 @@
                 let bg = (i === target) ? (isGreen ? 'bg-emerald-600 border-emerald-400' : 'bg-red-600 border-red-400') : 'bg-gray-800 border-gray-700';
                 html += `<div onclick="checkReact(${i === target}, ${isGreen})" class="h-24 rounded-2xl border ${bg} cursor-pointer active:scale-95 transition-all"></div>`;
             }
-            html
+            html += `</div>${getExitButtonHTML()}`;
+            document.getElementById('game-container').innerHTML = html;
+        }
+
+        function checkReact(isTarget, isGreen) {
+            if (isTarget && isGreen) reactData.score++;
+            reactData.rounds++;
+            nextReactRound();
+        }
+
+        // 4. Математический Спринт
+        let mathData = { score: 0, currentAnswer: 0, rounds: 0 };
+        function startMath() {
+            mathData = { score: 0, rounds: 0, currentAnswer: 0 };
+            document.getElementById('game-modal').classList.remove('hidden');
+            nextMathRound();
+        }
+
+        function nextMathRound() {
+            if (mathData.rounds >= 10) {
+                let xp = mathData.score * 5;
+                addScore('Математический Спринт', mathData.score, xp);
+                document.getElementById('game-container').innerHTML = `
+                    <h3 class="text-2xl font-bold text-white mb-2">Спринт окончен!</h3>
+                    <p class="text-gray-400 mb-4">Счет: ${mathData.score}/10 | Награда: +${xp} XP</p>
+                    <button onclick="closeModal()" class="w-full py-3 bg-indigo-600 rounded-2xl font-bold text-white">Завершить</button>
+                `;
+                return;
+            }
+            let a = Math.floor(Math.random() * 20) + 5;
+            let b = Math.floor(Math.random() * 20) + 5;
+            let op = Math.random() > 0.5 ? '+' : '-';
+            if (op === '-' && b > a) { let tmp = a; a = b; b = tmp; }
+            mathData.currentAnswer = op === '+' ? a + b : a - b;
+
+            let wrong1 = mathData.currentAnswer + (Math.random() > 0.5 ? 2 : -3);
+            let wrong2 = mathData.currentAnswer + (Math.random() > 0.5 ? 4 : -2);
+            let answers = [mathData.currentAnswer, wrong1, wrong2].sort(() => Math.random() - 0.5);
+
+            document.getElementById('game-container').innerHTML = `
+                <div class="text-xs text-gray-400 mb-2">Раунд ${mathData.rounds + 1} / 10</div>
+                <div class="text-3xl font-black text-white mb-6">${a} ${op} ${b} = ?</div>
+                <div class="flex flex-col gap-3 w-full mb-2">
+                    ${answers.map(ans => `<button onclick="checkMath(${ans})" class="py-3 bg-gray-800 border border-gray-700 rounded-2xl font-bold text-white hover:border-indigo-500 active:scale-95 transition-all">${ans}</button>`).join('')}
+                </div>
+                ${getExitButtonHTML()}
+            `;
+        }
+
+        function checkMath(ans) {
+            if (ans === mathData.currentAnswer) mathData.score++;
+            mathData.rounds++;
+            nextMathRound();
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp
