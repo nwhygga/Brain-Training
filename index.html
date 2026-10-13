@@ -1,741 +1,195 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NeuroFlex Brain Trainer</title>
-  
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <style>
-    body {
-      touch-action: manipulation;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
-    .game-card {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .game-card:active {
-      transform: scale(0.97);
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.05);
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.2);
-      border-radius: 4px;
-    }
-    @keyframes pulse-light {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    .animate-pulse-fast {
-      animation: pulse-light 1s infinite;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Нейро-Атлет | Тренажер мозга</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0b0f19; color: #f3f4f6; touch-action: manipulation; }
+        .tap-highlight { -webkit-tap-highlight-color: transparent; }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-cyan-500 selection:text-white">
+<body class="min-h-screen flex flex-col items-center justify-between p-4 tap-highlight select-none">
 
-  <!-- App Wrapper -->
-  <div class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-slate-900 border-x border-slate-800 shadow-2xl relative pb-20">
-    
-    <!-- Top Header / Profile Bar -->
-    <header class="p-4 bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-30 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="relative">
-          <div id="user-avatar" class="w-11 h-11 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-cyan-500/20 border border-white/20">
-            <i class="fa-solid font-bold text-lg">🧠</i>
-          </div>
-          <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full"></div>
-        </div>
-        <div>
-          <h1 id="user-name" class="font-bold text-slate-100 text-base leading-snug truncate max-w-[150px]">
-            Нейро-Атлет
-          </h1>
-          <span id="tg-status-badge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-            <i class="fa-brands fa-telegram"></i> Telegram Cloud
-          </span>
-        </div>
-      </div>
-      
-      <!-- Quick Stats -->
-      <div class="flex items-center gap-2">
-        <div class="text-right">
-          <div class="text-[10px] text-slate-400 uppercase font-semibold">Уровень</div>
-          <div id="user-level" class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">1</div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Stats Row -->
-    <section class="p-4 grid grid-cols-3 gap-2 bg-slate-900/40 border-b border-slate-800/80">
-      <div class="bg-slate-800/50 p-2.5 rounded-xl border border-slate-700/50 text-center">
-        <div class="text-[10px] text-slate-400 font-medium">Уровень</div>
-        <div id="stat-lvl" class="text-xl font-bold text-cyan-400 mt-0.5">1</div>
-      </div>
-      <div class="bg-slate-800/50 p-2.5 rounded-xl border border-slate-700/50 text-center">
-        <div class="text-[10px] text-slate-400 font-medium">Стрик</div>
-        <div id="stat-streak" class="text-xl font-bold text-amber-400 mt-0.5">0🔥</div>
-      </div>
-      <div class="bg-slate-800/50 p-2.5 rounded-xl border border-slate-700/50 text-center">
-        <div class="text-[10px] text-slate-400 font-medium">Опыт XP</div>
-        <div id="stat-xp" class="text-xl font-bold text-purple-400 mt-0.5">0</div>
-      </div>
-    </section>
-
-    <!-- Navigation Tabs -->
-    <nav class="p-3 bg-slate-900/80 sticky top-[69px] z-20 border-b border-slate-800">
-      <div class="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
-        <button id="tab-games" class="tab-btn flex-1 py-2 text-xs font-bold rounded-lg transition-all text-white bg-cyan-600 shadow-md">
-          Иигры
-        </button>
-        <button id="tab-analytics" class="tab-btn flex-1 py-2 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-slate-200">
-          Аналитика
-        </button>
-        <button id="tab-achievements" class="tab-btn flex-1 py-2 text-xs font-bold rounded-lg transition-all text-slate-400 hover:text-slate-200">
-          Достижения
-        </button>
-      </div>
-    </nav>
-
-    <!-- Main Content Panels Container -->
-    <main class="flex-1 p-4 overflow-y-auto custom-scrollbar relative">
-      
-      <!-- GAMES TAB -->
-      <section id="view-games" class="space-y-3">
-        <!-- Stroop Test -->
-        <div id="card-stroop" class="game-card bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-2xl p-4 flex items-center justify-between cursor-pointer">
-          <div class="flex items-center space-x-3.5">
-            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl font-bold">
-              🎨
+    <div class="w-full max-w-md bg-gray-900/90 backdrop-blur-xl border border-gray-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-5">
+        
+        <!-- Шапка профиля -->
+        <div class="flex items-center justify-between bg-gray-800/60 p-3.5 rounded-2xl border border-gray-700/50">
+            <div class="flex items-center gap-3">
+                <div id="user-avatar" class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">Н</div>
+                <div>
+                    <h2 id="user-name" class="font-bold text-base text-white">Нейро-Атлет</h2>
+                    <span id="sync-status" class="text-xs text-indigo-400 font-medium">Telegram Active</span>
+                </div>
             </div>
-            <div>
-              <h3 class="font-bold text-slate-100 text-sm">Тест Струпа</h3>
-              <p class="text-xs text-slate-400 mt-0.5">Гибкость мышления & внимание</p>
+            <div class="text-right">
+                <div class="text-xs text-gray-400">Ранг</div>
+                <div id="user-rank" class="text-sm font-bold text-indigo-300">Новичок</div>
             </div>
-          </div>
-          <i class="fa-solid fa-chevron-right text-slate-500 text-sm"></i>
         </div>
 
-        <!-- Memory Matrix -->
-        <div id="card-matrix" class="game-card bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-2xl p-4 flex items-center justify-between cursor-pointer">
-          <div class="flex items-center space-x-3.5">
-            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-xl font-bold">
-              🧩
+        <!-- Прогресс -->
+        <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-gray-800/60 p-3 rounded-2xl border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-1">Уровень</div>
+                <div id="stat-level" class="text-xl font-extrabold text-white">1</div>
             </div>
-            <div>
-              <h3 class="font-bold text-slate-100 text-sm">Матрица Памяти</h3>
-              <p class="text-xs text-slate-400 mt-0.5">Рабочая & пространственная память</p>
+            <div class="bg-gray-800/60 p-3 rounded-2xl border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-1">Стрик</div>
+                <div id="stat-streak" class="text-xl font-extrabold text-orange-400">1 дн</div>
             </div>
-          </div>
-          <i class="fa-solid fa-chevron-right text-slate-500 text-sm"></i>
-        </div>
-
-        <!-- Fast Reaction -->
-        <div id="card-reaction" class="game-card bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-2xl p-4 flex items-center justify-between cursor-pointer">
-          <div class="flex items-center space-x-3.5">
-            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl font-bold">
-              ⚡
+            <div class="bg-gray-800/60 p-3 rounded-2xl border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-1">Опыт XP</div>
+                <div id="stat-xp" class="text-xl font-extrabold text-indigo-400">0</div>
             </div>
-            <div>
-              <h3 class="font-bold text-slate-100 text-sm">Быстрая Реакция</h3>
-              <p class="text-xs text-slate-400 mt-0.5">Скорость обработки & контроль</p>
+        </div>
+
+        <!-- Вкладки -->
+        <div class="flex bg-gray-800/80 p-1.5 rounded-2xl gap-1 border border-gray-700/50">
+            <button id="btn-tab-games" class="flex-1 py-2 text-sm font-semibold rounded-xl bg-indigo-600 text-white shadow transition-all">Игры</button>
+            <button id="btn-tab-analytics" class="flex-1 py-2 text-sm font-semibold rounded-xl text-gray-400 hover:text-white transition-all">Аналитика</button>
+        </div>
+
+        <!-- Список Игр -->
+        <div id="view-games" class="flex flex-col gap-3">
+            <div id="card-struop" class="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-indigo-500/30 p-4 rounded-2xl cursor-pointer hover:border-indigo-500 transition-all active:scale-95">
+                <h3 class="font-bold text-white text-lg">Тест Струпа</h3>
+                <p class="text-xs text-gray-300 mt-1">Гибкость мышления & контроль реакций</p>
             </div>
-          </div>
-          <i class="fa-solid fa-chevron-right text-slate-500 text-sm"></i>
-        </div>
-
-        <!-- Math Sprint -->
-        <div id="card-math" class="game-card bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-2xl p-4 flex items-center justify-between cursor-pointer">
-          <div class="flex items-center space-x-3.5">
-            <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl font-bold">
-              🔢
+            <div id="card-memory" class="bg-gradient-to-r from-purple-900/40 to-pink-900/40 border border-purple-500/30 p-4 rounded-2xl cursor-pointer hover:border-purple-500 transition-all active:scale-95">
+                <h3 class="font-bold text-white text-lg">Матрица Памяти</h3>
+                <p class="text-xs text-gray-300 mt-1">Рабочая & пространственная память</p>
             </div>
-            <div>
-              <h3 class="font-bold text-slate-100 text-sm">Математический Спринт</h3>
-              <p class="text-xs text-slate-400 mt-0.5">Устный счет & концентрация</p>
+            <div id="card-reaction" class="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-500/30 p-4 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all active:scale-95">
+                <h3 class="font-bold text-white text-lg">Быстрая Реакция</h3>
+                <p class="text-xs text-gray-300 mt-1">Скорость реакции & выбор цели</p>
             </div>
-          </div>
-          <i class="fa-solid fa-chevron-right text-slate-500 text-sm"></i>
-        </div>
-      </section>
-
-      <!-- ANALYTICS TAB -->
-      <section id="view-analytics" class="hidden space-y-4">
-        <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-4">
-          <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center gap-2">
-            <i class="fa-solid fa-chart-line text-cyan-400"></i> Прогресс Навыков
-          </h3>
-          <div class="space-y-3">
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-400">Внимание</span>
-                <span id="skill-attention" class="text-cyan-400 font-bold">45%</span>
-              </div>
-              <div class="w-full bg-slate-700/50 h-2 rounded-full overflow-hidden">
-                <div id="bar-attention" class="bg-cyan-500 h-full rounded-full transition-all duration-500" style="width: 45%"></div>
-              </div>
+            <div id="card-math" class="bg-gradient-to-r from-amber-900/40 to-orange-900/40 border border-amber-500/30 p-4 rounded-2xl cursor-pointer hover:border-amber-500 transition-all active:scale-95">
+                <h3 class="font-bold text-white text-lg">Математический Спринт</h3>
+                <p class="text-xs text-gray-300 mt-1">Устный счет & фокус под давлением</p>
             </div>
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-400">Память</span>
-                <span id="skill-memory" class="text-purple-400 font-bold">30%</span>
-              </div>
-              <div class="w-full bg-slate-700/50 h-2 rounded-full overflow-hidden">
-                <div id="bar-memory" class="bg-purple-500 h-full rounded-full transition-all duration-500" style="width: 30%"></div>
-              </div>
+        </div>
+
+        <!-- Аналитика -->
+        <div id="view-analytics" class="hidden flex flex-col gap-3">
+            <div class="bg-gray-800/60 p-4 rounded-2xl border border-gray-700/50">
+                <h4 class="font-bold text-white mb-2 text-sm">История тренировок</h4>
+                <div id="history-list" class="flex flex-col gap-2 max-h-60 overflow-y-auto text-xs text-gray-300">
+                    <p class="text-gray-500 text-center py-4">Пока нет тренировок. Сыграй в первую игру!</p>
+                </div>
             </div>
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-400">Скорость</span>
-                <span id="skill-speed" class="text-emerald-400 font-bold">60%</span>
-              </div>
-              <div class="w-full bg-slate-700/50 h-2 rounded-full overflow-hidden">
-                <div id="bar-speed" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 60%"></div>
-              </div>
-            </div>
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="text-slate-400">Логика</span>
-                <span id="skill-logic" class="text-amber-400 font-bold">25%</span>
-              </div>
-              <div class="w-full bg-slate-700/50 h-2 rounded-full overflow-hidden">
-                <div id="bar-logic" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 25%"></div>
-              </div>
-            </div>
-          </div>
         </div>
 
-        <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-4">
-          <h3 class="font-bold text-sm text-slate-200 mb-2">Статистика Сессий</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Сыграно всего игр: <span id="total-played" class="font-bold text-white">0</span><br>
-            Текущий стрих (дней подряд): <span id="streak-days" class="font-bold text-amber-400">0</span>
-          </p>
+    </div>
+
+    <!-- Модальное окно игры -->
+    <div id="game-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-3xl p-6 flex flex-col items-center text-center relative shadow-2xl">
+            <button id="btn-close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold p-2">✕</button>
+            <div id="game-container" class="w-full flex flex-col items-center"></div>
         </div>
-      </section>
+    </div>
 
-      <!-- ACHIEVEMENTS TAB -->
-      <section id="view-achievements" class="hidden space-y-3">
-        <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-3 flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">🥉</div>
-          <div>
-            <h4 class="font-bold text-xs text-slate-200">Первый Шаг</h4>
-            <p class="text-[11px] text-slate-400">Сыграть 1 игру в тренажере</p>
-          </div>
-        </div>
-        <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-3 flex items-center gap-3 opacity-60">
-          <div class="w-10 h-10 rounded-xl bg-slate-700 text-slate-400 flex items-center justify-center text-lg">⚡</div>
-          <div>
-            <h4 class="font-bold text-xs text-slate-200">Молниеносный</h4>
-            <p class="text-[11px] text-slate-400">Набрать 100+ очков в Быстрой Реакции</p>
-          </div>
-        </div>
-        <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-3 flex items-center gap-3 opacity-60">
-          <div class="w-10 h-10 rounded-xl bg-slate-700 text-slate-400 flex items-center justify-center text-lg">🧠</div>
-          <div>
-            <h4 class="font-bold text-xs text-slate-200">Гений Матрицы</h4>
-            <p class="text-[11px] text-slate-400">Пройти 5 уровней в Матрице Памяти</p>
-          </div>
-        </div>
-      </section>
+    <script>
+        let tg = window.Telegram?.WebApp;
+        let userData = { xp: 0, level: 1, streak: 1, history: [] };
 
-      <!-- GAME OVERLAY / ACTIVE PLAY CONTAINER -->
-      <div id="game-overlay" class="fixed inset-0 bg-slate-900 z-50 flex flex-col justify-between hidden max-w-md mx-auto">
-        <!-- Game Top Bar -->
-        <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
-          <button id="btn-close-game" class="p-2 text-slate-400 hover:text-white rounded-lg bg-slate-800">
-            <i class="fa-solid fa-xmark text-lg"></i>
-          </button>
-          <h2 id="game-title" class="font-bold text-base text-slate-100">Название игры</h2>
-          <div id="game-timer" class="font-mono font-bold text-cyan-400 text-base">00:30</div>
-        </div>
-
-        <!-- Game Screen Inner Content -->
-        <div id="game-stage" class="flex-1 p-4 flex flex-col items-center justify-center relative">
-          <!-- Dynamically Injected Game Canvas / Elements -->
-        </div>
-
-        <!-- Game Footer Controls -->
-        <div id="game-controls" class="p-4 border-t border-slate-800 bg-slate-900/90 flex justify-center gap-3">
-          <!-- Dynamic Action Buttons -->
-        </div>
-      </div>
-
-    </main>
-  </div>
-
-  <script>
-    /* Initialize Telegram WebApp API Safely */
-    const tg = window.Telegram?.WebApp || null;
-
-    if (tg) {
-      try {
-        tg.ready();
-        tg.expand();
-      } catch (e) {
-        console.log("Telegram WebApp ready status error", e);
-      }
-    }
-
-    // App State Management
-    const state = {
-      xp: 0,
-      level: 1,
-      streak: 1,
-      gamesPlayed: 0,
-      skills: {
-        attention: 30,
-        memory: 20,
-        speed: 40,
-        logic: 25
-      }
-    };
-
-    // Load Saved State
-    function loadUserData() {
-      try {
-        const saved = localStorage.getItem('neuro_flex_data');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          Object.assign(state, parsed);
-        }
-      } catch (e) {
-        console.error("Failed to load user state", e);
-      }
-
-      // Update Telegram User profile if available
-      if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        const user = tg.initDataUnsafe.user;
-        const nameEl = document.getElementById('user-name');
-        if (nameEl && user.first_name) {
-          nameEl.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-        }
-      }
-      updateUI();
-    }
-
-    function saveUserData() {
-      try {
-        localStorage.setItem('neuro_flex_data', JSON.stringify(state));
-        if (tg && tg.CloudStorage) {
-          tg.CloudStorage.setItem('neuro_flex_data', JSON.stringify(state));
-        }
-      } catch (e) {
-        console.error("Save state error", e);
-      }
-    }
-
-    function addXP(amount, skill) {
-      state.xp += amount;
-      state.gamesPlayed += 1;
-      state.level = Math.floor(state.xp / 100) + 1;
-
-      if (skill && state.skills[skill] !== undefined) {
-        state.skills[skill] = Math.min(100, state.skills[skill] + 5);
-      }
-
-      saveUserData();
-      updateUI();
-    }
-
-    function updateUI() {
-      document.getElementById('user-level').textContent = state.level;
-      document.getElementById('stat-lvl').textContent = state.level;
-      document.getElementById('stat-streak').textContent = `${state.streak}🔥`;
-      document.getElementById('stat-xp').textContent = state.xp;
-
-      // Analytics
-      document.getElementById('skill-attention').textContent = `${state.skills.attention}%`;
-      document.getElementById('bar-attention').style.width = `${state.skills.attention}%`;
-
-      document.getElementById('skill-memory').textContent = `${state.skills.memory}%`;
-      document.getElementById('bar-memory').style.width = `${state.skills.memory}%`;
-
-      document.getElementById('skill-speed').textContent = `${state.skills.speed}%`;
-      document.getElementById('bar-speed').style.width = `${state.skills.speed}%`;
-
-      document.getElementById('skill-logic').textContent = `${state.skills.logic}%`;
-      document.getElementById('bar-logic').style.width = `${state.skills.logic}%`;
-
-      document.getElementById('total-played').textContent = state.gamesPlayed;
-      document.getElementById('streak-days').textContent = state.streak;
-    }
-
-    // Navigation Tabs Switcher
-    const tabs = {
-      'tab-games': 'view-games',
-      'tab-analytics': 'view-analytics',
-      'tab-achievements': 'view-achievements'
-    };
-
-    Object.keys(tabs).forEach(tabId => {
-      const btn = document.getElementById(tabId);
-      if (!btn) return;
-      btn.addEventListener('click', () => {
-        // Reset button styles
-        document.querySelectorAll('.tab-btn').forEach(b => {
-          b.classList.remove('bg-cyan-600', 'text-white', 'shadow-md');
-          b.classList.add('text-slate-400');
-        });
-        btn.classList.add('bg-cyan-600', 'text-white', 'shadow-md');
-        btn.classList.remove('text-slate-400');
-
-        // Hide all views
-        Object.values(tabs).forEach(viewId => {
-          document.getElementById(viewId).classList.add('hidden');
-        });
-        // Show target view
-        document.getElementById(tabs[tabId]).classList.remove('hidden');
-      });
-    });
-
-    // Active Game Variables
-    let gameTimerInterval = null;
-    let currentGameCloseHandler = null;
-
-    function openGameOverlay(title) {
-      document.getElementById('game-title').textContent = title;
-      document.getElementById('game-overlay').classList.remove('hidden');
-    }
-
-    function closeGameOverlay() {
-      if (gameTimerInterval) clearInterval(gameTimerInterval);
-      if (currentGameCloseHandler) currentGameCloseHandler();
-      document.getElementById('game-overlay').classList.add('hidden');
-      document.getElementById('game-stage').innerHTML = '';
-      document.getElementById('game-controls').innerHTML = '';
-    }
-
-    document.getElementById('btn-close-game').addEventListener('click', closeGameOverlay);
-
-    // 1. GAME: STROOP TEST (ТЕСТ СТРУПА)
-    function startStroopTest() {
-      openGameOverlay('Тест Струпа');
-      
-      const colors = [
-        { name: 'КРАСНЫЙ', color: '#ef4444' },
-        { name: 'СИНИЙ', color: '#3b82f6' },
-        { name: 'ЗЕЛЕНЫЙ', color: '#10b981' },
-        { name: 'ЖЕЛТЫЙ', color: '#eab308' }
-      ];
-
-      let score = 0;
-      let timeLeft = 20;
-
-      const stage = document.getElementById('game-stage');
-      const controls = document.getElementById('game-controls');
-      const timerEl = document.getElementById('game-timer');
-
-      stage.innerHTML = `
-        <div class="text-center">
-          <p class="text-xs text-slate-400 mb-6">Совпадает ли ЗНАЧЕНИЕ слова с ЦВЕТОМ текста?</p>
-          <div id="stroop-word" class="text-4xl font-black my-8 tracking-wider">КРАСНЫЙ</div>
-          <div class="text-slate-300 font-bold text-lg">Счет: <span id="stroop-score" class="text-cyan-400">0</span></div>
-        </div>
-      `;
-
-      controls.innerHTML = `
-        <button id="btn-stroop-no" class="flex-1 py-3.5 bg-red-600 hover:bg-red-500 font-bold text-white rounded-xl text-base shadow-lg active:scale-95">
-          ❌ НЕТ
-        </button>
-        <button id="btn-stroop-yes" class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 font-bold text-white rounded-xl text-base shadow-lg active:scale-95">
-          ✅ ДА
-        </button>
-      `;
-
-      let currentMatch = false;
-
-      function nextQuestion() {
-        const wordObj = colors[Math.floor(Math.random() * colors.length)];
-        const colorObj = colors[Math.floor(Math.random() * colors.length)];
-
-        currentMatch = (wordObj.name === colorObj.name);
-
-        const wordEl = document.getElementById('stroop-word');
-        wordEl.textContent = wordObj.name;
-        wordEl.style.color = colorObj.color;
-      }
-
-      function handleAnswer(userAnswer) {
-        if (userAnswer === currentMatch) {
-          score += 10;
-        } else {
-          score = Math.max(0, score - 5);
-        }
-        document.getElementById('stroop-score').textContent = score;
-        nextQuestion();
-      }
-
-      document.getElementById('btn-stroop-yes').onclick = () => handleAnswer(true);
-      document.getElementById('btn-stroop-no').onclick = () => handleAnswer(false);
-
-      nextQuestion();
-
-      timerEl.textContent = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
-      gameTimerInterval = setInterval(() => {
-        timeLeft--;
-        timerEl.textContent = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
-        if (timeLeft <= 0) {
-          clearInterval(gameTimerInterval);
-          addXP(score, 'attention');
-          stage.innerHTML = `
-            <div class="text-center space-y-3">
-              <h3 class="text-2xl font-bold text-white">Игра завершена! 🎉</h3>
-              <p class="text-slate-300">Набрано очков: <span class="font-bold text-cyan-400">${score}</span></p>
-              <p class="text-xs text-purple-400 font-semibold">+${score} XP получено!</p>
-            </div>
-          `;
-          controls.innerHTML = `<button onclick="closeGameOverlay()" class="w-full py-3 bg-cyan-600 font-bold text-white rounded-xl">Завершить</button>`;
-        }
-      }, 1000);
-    }
-
-    // 2. GAME: FAST REACTION (БЫСТРАЯ РЕАКЦИЯ)
-    function startReactionGame() {
-      openGameOverlay('Быстрая Реакция');
-
-      const stage = document.getElementById('game-stage');
-      const controls = document.getElementById('game-controls');
-      const timerEl = document.getElementById('game-timer');
-
-      let startTime = 0;
-      let score = 0;
-      let stateGame = 'waiting'; // waiting, ready, clicked
-      let timeoutId = null;
-
-      stage.innerHTML = `
-        <div id="reaction-box" class="w-full h-64 bg-slate-800 rounded-2xl flex flex-col items-center justify-center border-2 border-slate-700 cursor-pointer p-4 text-center">
-          <span id="reaction-text" class="text-lg font-bold text-slate-300">Нажмите, чтобы начать</span>
-        </div>
-      `;
-      controls.innerHTML = '';
-      timerEl.textContent = '⏱️';
-
-      const box = document.getElementById('reaction-box');
-      const text = document.getElementById('reaction-text');
-
-      function resetForNext() {
-        stateGame = 'waiting';
-        box.className = "w-full h-64 bg-slate-800 rounded-2xl flex flex-col items-center justify-center border-2 border-slate-700 cursor-pointer p-4 text-center";
-        text.textContent = "Ждите зеленый цвет...";
-
-        const delay = Math.floor(Math.random() * 2000) + 1500;
-        timeoutId = setTimeout(() => {
-          stateGame = 'ready';
-          box.className = "w-full h-64 bg-emerald-500 rounded-2xl flex flex-col items-center justify-center border-2 border-emerald-400 cursor-pointer p-4 text-center shadow-lg shadow-emerald-500/50";
-          text.textContent = "ЖМИ СЕЙЧАС!";
-          startTime = Date.now();
-        }, delay);
-      }
-
-      box.onclick = () => {
-        if (stateGame === 'waiting') {
-          clearTimeout(timeoutId);
-          text.textContent = "Слишком рано! Нажмите еще раз";
-          box.className = "w-full h-64 bg-red-900/40 rounded-2xl flex flex-col items-center justify-center border-2 border-red-500 cursor-pointer p-4 text-center";
-          stateGame = 'clicked';
-        } else if (stateGame === 'ready') {
-          const reactionTime = Date.now() - startTime;
-          score = Math.max(10, 500 - reactionTime);
-          addXP(Math.round(score / 5), 'speed');
-          
-          text.innerHTML = `Время: <span class="text-amber-300 text-2xl font-black">${reactionTime} мс</span><br><span class="text-xs text-slate-200 mt-2 block">Нажмите для повтора</span>`;
-          box.className = "w-full h-64 bg-cyan-600 rounded-2xl flex flex-col items-center justify-center border-2 border-cyan-400 cursor-pointer p-4 text-center";
-          stateGame = 'clicked';
-        } else if (stateGame === 'clicked') {
-          resetForNext();
-        }
-      };
-
-      currentGameCloseHandler = () => clearTimeout(timeoutId);
-    }
-
-    // 3. GAME: MATH SPRINT (МАТЕМАТИЧЕСКИЙ СПРИНТ)
-    function startMathSprint() {
-      openGameOverlay('Математический Спринт');
-
-      let score = 0;
-      let timeLeft = 25;
-
-      const stage = document.getElementById('game-stage');
-      const controls = document.getElementById('game-controls');
-      const timerEl = document.getElementById('game-timer');
-
-      stage.innerHTML = `
-        <div class="text-center">
-          <p class="text-xs text-slate-400 mb-4">Решите пример как можно быстрее:</p>
-          <div id="math-expression" class="text-3xl font-black my-6 text-cyan-400">2 + 2</div>
-          <div class="grid grid-cols-2 gap-3 mt-4" id="math-options"></div>
-          <div class="text-slate-300 font-bold text-sm mt-6">Очки: <span id="math-score" class="text-emerald-400">0</span></div>
-        </div>
-      `;
-
-      controls.innerHTML = '';
-
-      function generateQuestion() {
-        const a = Math.floor(Math.random() * 20) + 1;
-        const b = Math.floor(Math.random() * 20) + 1;
-        const isPlus = Math.random() > 0.5;
-        const correct = isPlus ? a + b : a - b;
-
-        document.getElementById('math-expression').textContent = `${a} ${isPlus ? '+' : '-'} ${b}`;
-
-        const options = [correct];
-        while (options.length < 4) {
-          const wrong = correct + (Math.floor(Math.random() * 10) - 5);
-          if (!options.includes(wrong) && wrong !== correct) {
-            options.push(wrong);
-          }
-        }
-        options.sort(() => Math.random() - 0.5);
-
-        const optionsContainer = document.getElementById('math-options');
-        optionsContainer.innerHTML = '';
-        options.forEach(opt => {
-          const btn = document.createElement('button');
-          btn.className = "py-3 bg-slate-800 hover:bg-slate-700 font-bold text-white rounded-xl border border-slate-700 text-lg shadow active:scale-95";
-          btn.textContent = opt;
-          btn.onclick = () => {
-            if (opt === correct) {
-              score += 15;
-            } else {
-              score = Math.max(0, score - 10);
+        function initApp() {
+            if (tg) {
+                try {
+                    tg.ready();
+                    tg.expand();
+                    if (tg.initDataUnsafe?.user) {
+                        let user = tg.initDataUnsafe.user;
+                        document.getElementById('user-name').innerText = user.first_name || 'Нейро-Атлет';
+                        if (user.photo_url) {
+                            document.getElementById('user-avatar').innerHTML = `<img src="${user.photo_url}" class="w-full h-full rounded-full object-cover">`;
+                        }
+                    }
+                } catch(e) {}
             }
-            document.getElementById('math-score').textContent = score;
-            generateQuestion();
-          };
-          optionsContainer.appendChild(btn);
-        });
-      }
-
-      generateQuestion();
-
-      timerEl.textContent = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
-      gameTimerInterval = setInterval(() => {
-        timeLeft--;
-        timerEl.textContent = `00:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
-        if (timeLeft <= 0) {
-          clearInterval(gameTimerInterval);
-          addXP(score, 'logic');
-          stage.innerHTML = `
-            <div class="text-center space-y-3">
-              <h3 class="text-2xl font-bold text-white">Время вышло! 🧮</h3>
-              <p class="text-slate-300">Итоговый результат: <span class="font-bold text-cyan-400">${score}</span></p>
-              <p class="text-xs text-purple-400 font-semibold">+${score} XP получено!</p>
-            </div>
-          `;
-          controls.innerHTML = `<button onclick="closeGameOverlay()" class="w-full py-3 bg-cyan-600 font-bold text-white rounded-xl">Закрыть</button>`;
-        }
-      }, 1000);
-    }
-
-    // 4. GAME: MEMORY MATRIX (МАТРИЦА ПАМЯТИ)
-    function startMemoryMatrix() {
-      openGameOverlay('Матрица Памяти');
-
-      const stage = document.getElementById('game-stage');
-      const controls = document.getElementById('game-controls');
-      const timerEl = document.getElementById('game-timer');
-
-      let gridCount = 3; // 3x3
-      let activeTiles = [];
-      let userClicked = [];
-      let score = 0;
-
-      stage.innerHTML = `
-        <div class="text-center w-full">
-          <p id="matrix-hint" class="text-xs text-slate-400 mb-4">Запомните подсвеченные плитки</p>
-          <div id="matrix-grid" class="grid grid-cols-3 gap-2 mx-auto w-64 h-64 bg-slate-800 p-2 rounded-2xl border border-slate-700"></div>
-          <div class="text-slate-300 font-bold text-sm mt-4">Уровень: <span id="matrix-lvl" class="text-amber-400">1</span></div>
-        </div>
-      `;
-      controls.innerHTML = '';
-      timerEl.textContent = '🧩';
-
-      function renderGrid() {
-        const grid = document.getElementById('matrix-grid');
-        grid.innerHTML = '';
-        userClicked = [];
-        activeTiles = [];
-
-        // Generate 3 random target tiles
-        while (activeTiles.length < 3) {
-          const rnd = Math.floor(Math.random() * 9);
-          if (!activeTiles.includes(rnd)) activeTiles.push(rnd);
+            loadData();
+            setupEventListeners();
+            updateUI();
         }
 
-        for (let i = 0; i < 9; i++) {
-          const tile = document.createElement('div');
-          tile.dataset.index = i;
-          tile.className = "rounded-xl bg-slate-700 transition-all duration-300 cursor-pointer";
-          grid.appendChild(tile);
+        function loadData() {
+            try {
+                let saved = localStorage.getItem('neuro_flex_data');
+                if (saved) userData = JSON.parse(saved);
+            } catch(e) {}
         }
 
-        // Highlight
-        const tiles = grid.children;
-        activeTiles.forEach(idx => {
-          tiles[idx].classList.add('bg-cyan-400', 'shadow-lg', 'shadow-cyan-400/50');
-        });
-
-        document.getElementById('matrix-hint').textContent = 'Запоминайте...';
-
-        setTimeout(() => {
-          activeTiles.forEach(idx => {
-            tiles[idx].classList.remove('bg-cyan-400', 'shadow-lg', 'shadow-cyan-400/50');
-          });
-          document.getElementById('matrix-hint').textContent = 'Повторите рисунок!';
-
-          // Enable user clicks
-          Array.from(tiles).forEach(tile => {
-            tile.onclick = (e) => {
-              const clickedIdx = parseInt(e.target.dataset.index);
-              if (userClicked.includes(clickedIdx)) return;
-
-              userClicked.push(clickedIdx);
-
-              if (activeTiles.includes(clickedIdx)) {
-                e.target.classList.add('bg-emerald-500');
-                if (userClicked.length === activeTiles.length) {
-                  score += 25;
-                  addXP(25, 'memory');
-                  document.getElementById('matrix-lvl').textContent = Math.floor(score / 25) + 1;
-                  setTimeout(renderGrid, 600);
+        function saveData() {
+            try {
+                localStorage.setItem('neuro_flex_data', JSON.stringify(userData));
+                if (tg && tg.CloudStorage && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9')) {
+                    tg.CloudStorage.setItem('neuro_flex_data', JSON.stringify(userData));
                 }
-              } else {
-                e.target.classList.add('bg-red-500');
-                document.getElementById('matrix-hint').textContent = 'Ошибка! Пробуем снова...';
-                setTimeout(renderGrid, 1000);
-              }
-            };
-          });
-        }, 1200);
-      }
+            } catch(e) {}
+        }
 
-      renderGrid();
-    }
+        function updateUI() {
+            document.getElementById('stat-xp').innerText = userData.xp;
+            document.getElementById('stat-level').innerText = userData.level;
+            document.getElementById('stat-streak').innerText = userData.streak + ' дн';
+            
+            let rank = 'Новичок';
+            if (userData.level >= 3) rank = 'Адепт';
+            if (userData.level >= 5) rank = 'Эксперт';
+            if (userData.level >= 8) rank = 'Мастер';
+            document.getElementById('user-rank').innerText = rank;
 
-    // Attach Event Listeners to Game Cards
-    document.getElementById('card-stroop').onclick = startStroopTest;
-    document.getElementById('card-reaction').onclick = startReactionGame;
-    document.getElementById('card-math').onclick = startMathSprint;
-    document.getElementById('card-matrix').onclick = startMemoryMatrix;
+            let histHTML = '';
+            if (!userData.history || userData.history.length === 0) {
+                histHTML = '<p class="text-gray-500 text-center py-4">Пока нет тренировок. Сыграй в первую игру!</p>';
+            } else {
+                userData.history.slice(-10).reverse().forEach(h => {
+                    histHTML += `<div class="flex justify-between items-center bg-gray-900/60 p-2.5 rounded-xl border border-gray-800">
+                        <span class="font-medium text-white">${h.game}</span>
+                        <span class="text-indigo-400 font-bold">+${h.xp} XP (${h.score} очков)</span>
+                    </div>`;
+                });
+            }
+            document.getElementById('history-list').innerHTML = histHTML;
+        }
 
-    // Initialize App
-    window.onload = () => {
-      loadUserData();
-    };
-  </script>
-</body>
-</html>
+        function bindClick(id, handler) {
+            let el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('click', handler);
+            }
+        }
+
+        function setupEventListeners() {
+            bindClick('btn-tab-games', () => switchTab('games'));
+            bindClick('btn-tab-analytics', () => switchTab('analytics'));
+            bindClick('card-struop', startStruop);
+            bindClick('card-memory', startMemory);
+            bindClick('card-reaction', startReaction);
+            bindClick('card-math', startMath);
+            bindClick('btn-close-modal', closeModal);
+        }
+
+        function switchTab(tab) {
+            if (tab === 'games') {
+                document.getElementById('view-games').classList.remove('hidden');
+                document.getElementById('view-analytics').classList.add('hidden');
+                document.getElementById('btn-tab-games').className = "flex-1 py-2 text-sm font-semibold rounded-xl bg-indigo-600 text-white shadow transition-all";
+                document.getElementById('btn-tab-analytics').className = "flex-1 py-2 text-sm font-semibold rounded-xl text-gray-400 hover:text-white transition-all";
+            } else {
+                document.getElementById('view-games').classList.add('hidden');
+                document.getElementById('view-analytics').classList.remove('hidden');
+                document.getElementById('btn-tab-analytics').className = "flex-1 py-2 text-sm font-semibold rounded-xl bg-indigo-600 text-white shadow transition-all";
+                document.getElementById('btn-tab-games').className = "flex-1 py-2 text-sm font-semibold rounded-xl text-gray-400 hover:text-white transition-all";
+            }
+        }
+
+        function addScore(gameName, score, xp) {
+            userData.xp += xp;
+            userData.level = Math.floor(userData.xp / 100) + 1;
+            if (!userData.history) userData.history = [];
+            userData.history.push({ game: gameName, score: score, xp: xp, date: new Date().toLocaleDateString
