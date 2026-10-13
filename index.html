@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Нейро-Атлет | Хардкор Сессия</title>
+    <title>Нейро-Атлет | Полная Хардкор Версия</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -13,67 +13,134 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-between p-4 tap-highlight">
 
-    <!-- Меню выбора уровня сложности -->
-    <div id="main-menu" class="w-full max-w-md bg-gray-900/90 backdrop-blur-xl border border-gray-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-5 my-auto">
+    <!-- Главное Меню -->
+    <div id="main-menu" class="w-full max-w-md bg-gray-900/90 backdrop-blur-xl border border-gray-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-4 my-auto">
+        
+        <!-- Шапка профиля и рангов -->
         <div class="flex items-center justify-between bg-gray-800/60 p-3.5 rounded-2xl border border-gray-700/50">
-            <div>
-                <h2 class="font-bold text-base text-white">Нейро-Атлет</h2>
-                <span class="text-xs text-indigo-400 font-medium">Хардкор с таймером v4.0</span>
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">Н</div>
+                <div>
+                    <h2 class="font-bold text-base text-white">Нейро-Атлет</h2>
+                    <span id="user-rank" class="text-xs text-indigo-400 font-semibold">Новичок</span>
+                </div>
             </div>
             <div class="text-right">
-                <div class="text-xs text-gray-400">Опыт XP</div>
-                <div id="stat-xp" class="text-sm font-bold text-indigo-300">0</div>
+                <div class="text-xs text-gray-400">Уровень / XP</div>
+                <div class="text-sm font-bold text-indigo-300"><span id="stat-level">1</span> ур (<span id="stat-xp">0</span>)</div>
             </div>
         </div>
 
-        <div class="flex flex-col gap-3">
-            <h3 class="font-bold text-white text-sm">Выбери уровень сложности:</h3>
-            <button onclick="startComplexSession(1)" class="p-3.5 bg-blue-600/20 border border-blue-500 rounded-2xl text-left transition-all active:scale-95 tap-highlight">
+        <!-- Переключатель вкладок меню -->
+        <div class="flex bg-gray-800/80 p-1.5 rounded-2xl gap-1 border border-gray-700/50">
+            <button onclick="switchMenuTab('start')" id="btn-tab-start" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-indigo-600 text-white shadow transition-all">Тренировка</button>
+            <button onclick="switchMenuTab('history')" id="btn-tab-history" class="flex-1 py-2 text-xs font-semibold rounded-xl text-gray-400 hover:text-white transition-all">История и Статистика</button>
+        </div>
+
+        <!-- Вкладка 1: Выбор сложности и запуск -->
+        <div id="menu-view-start" class="flex flex-col gap-3">
+            <h3 class="font-bold text-white text-xs uppercase tracking-wider text-gray-400">Выбери режим сложности:</h3>
+            <button onclick="startComplexSession(1)" class="p-3.5 bg-blue-600/20 border border-blue-500/40 hover:border-blue-500 rounded-2xl text-left transition-all active:scale-95 tap-highlight">
                 <div class="font-bold text-blue-400 text-sm">🟢 Уровень 1: Базовый</div>
-                <div class="text-[11px] text-gray-300">Много времени на раунд, мягкий темп.</div>
+                <div class="text-[11px] text-gray-300 mt-0.5">Лимит: 10 сек на задание. Размеренный темп.</div>
             </button>
-            <button onclick="startComplexSession(2)" class="p-3.5 bg-amber-600/20 border border-amber-500 rounded-2xl text-left transition-all active:scale-95 tap-highlight">
-                <div class="font-bold text-amber-400 text-sm">🟡 Уровень 2: Эксперт</div>
-                <div class="text-[11px] text-gray-300">Умеренный таймер, усложненные задачи.</div>
+            <button onclick="startComplexSession(2)" class="p-3.5 bg-amber-600/20 border border-amber-500/40 hover:border-amber-500 rounded-2xl text-left transition-all active:scale-95 tap-highlight">
+                <div class="font-bold text-amber-400 text-sm">🟡 Уровень 2: Продвинутый</div>
+                <div class="text-[11px] text-gray-300 mt-0.5">Лимит: 6 сек на задание. Повышенная нагрузка.</div>
             </button>
-            <button onclick="startComplexSession(3)" class="p-3.5 bg-red-600/20 border border-red-500 rounded-2xl text-left transition-all active:scale-95 tap-highlight">
+            <button onclick="startComplexSession(3)" class="p-3.5 bg-red-600/20 border border-red-500/40 hover:border-red-500 rounded-2xl text-left transition-all active:scale-95 tap-highlight">
                 <div class="font-bold text-red-400 text-sm">🔴 Уровень 3: Хардкор</div>
-                <div class="text-[11px] text-gray-300">Жесткий таймер (4 сек), 0 права на ошибку.</div>
+                <div class="text-[11px] text-gray-300 mt-0.5">Лимит: 3.5 сек! Ошибка сбрасывает задание на новое.</div>
             </button>
+        </div>
+
+        <!-- Вкладка 2: История сессий -->
+        <div id="menu-view-history" class="hidden flex flex-col gap-3">
+            <h3 class="font-bold text-white text-xs uppercase tracking-wider text-gray-400">Лог прошлых сессий:</h3>
+            <div id="history-list" class="flex flex-col gap-2 max-h-56 overflow-y-auto text-xs text-gray-300 pr-1">
+                <p class="text-gray-500 text-center py-6">Пока нет завершенных сессий.</p>
+            </div>
         </div>
     </div>
 
-    <!-- Модальное окно сессии -->
+    <!-- Модальное окно игрового процесса -->
     <div id="game-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
         <div class="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-3xl p-6 flex flex-col items-center text-center relative shadow-2xl">
             <button onclick="abortSession()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold p-2 tap-highlight">✕</button>
-            <!-- Таймер-полоска -->
-            <div class="w-full bg-gray-800 h-1.5 rounded-full mb-4 overflow-hidden">
-                <div id="timer-bar" class="bg-indigo-500 h-full w-full transition-all duration-100"></div>
+            
+            <!-- Панель таймера -->
+            <div class="w-full mb-4">
+                <div class="flex justify-between items-center text-[11px] text-gray-400 mb-1 font-semibold">
+                    <span>Таймер раунда:</span>
+                    <span id="timer-text" class="text-indigo-400 font-bold">10.0s</span>
+                </div>
+                <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden border border-gray-700/50">
+                    <div id="timer-bar" class="bg-indigo-500 h-full w-full transition-all duration-100"></div>
+                </div>
             </div>
+
             <div id="game-container" class="w-full flex flex-col items-center"></div>
         </div>
     </div>
 
     <script>
-        let userData = { xp: 0 };
-        let currentDifficulty = 1; // 1, 2, 3
+        let userData = { xp: 0, level: 1, history: [] };
+        let currentDifficulty = 1;
         let sessionResults = { struop: 0, memory: 0, reaction: 0, math: 0 };
         let currentStage = 1;
         
         let roundTimer = null;
         let timeLeft = 10;
-        let totalTimeForRound = 10;
+        let totalTimeForTask = 10;
 
         function loadData() {
-            let saved = localStorage.getItem('neuro_flex_v4');
+            let saved = localStorage.getItem('neuro_flex_full_v5');
             if (saved) { try { userData = JSON.parse(saved); } catch(e) {} }
-            document.getElementById('stat-xp').innerText = userData.xp;
+            updateUI();
         }
 
         function saveData() {
-            localStorage.setItem('neuro_flex_v4', JSON.stringify(userData));
+            localStorage.setItem('neuro_flex_full_v5', JSON.stringify(userData));
+            updateUI();
+        }
+
+        function updateUI() {
             document.getElementById('stat-xp').innerText = userData.xp;
+            document.getElementById('stat-level').innerText = userData.level;
+
+            let rank = 'Новичок';
+            if (userData.level >= 3) rank = 'Адепт';
+            if (userData.level >= 6) rank = 'Эксперт';
+            if (userData.level >= 10) rank = 'Мастер';
+            if (userData.level >= 15) rank = 'Грандмастер';
+            document.getElementById('user-rank').innerText = rank;
+
+            let histHTML = '';
+            if (!userData.history || userData.history.length === 0) {
+                histHTML = '<p class="text-gray-500 text-center py-6">Пока нет завершенных сессий.</p>';
+            } else {
+                userData.history.slice(-10).reverse().forEach(h => {
+                    histHTML += `<div class="flex justify-between items-center bg-gray-800/60 p-3 rounded-xl border border-gray-700/50">
+                        <span class="font-medium text-white">Сессия (${h.date})</span>
+                        <span class="text-indigo-400 font-bold">+${h.totalXp} XP (Счет: ${h.totalScore})</span>
+                    </div>`;
+                });
+            }
+            document.getElementById('history-list').innerHTML = histHTML;
+        }
+
+        function switchMenuTab(tab) {
+            if (tab === 'start') {
+                document.getElementById('menu-view-start').classList.remove('hidden');
+                document.getElementById('menu-view-history').classList.add('hidden');
+                document.getElementById('btn-tab-start').className = "flex-1 py-2 text-xs font-semibold rounded-xl bg-indigo-600 text-white shadow transition-all";
+                document.getElementById('btn-tab-history').className = "flex-1 py-2 text-xs font-semibold rounded-xl text-gray-400 hover:text-white transition-all";
+            } else {
+                document.getElementById('menu-view-start').classList.add('hidden');
+                document.getElementById('menu-view-history').classList.remove('hidden');
+                document.getElementById('btn-tab-history').className = "flex-1 py-2 text-xs font-semibold rounded-xl bg-indigo-600 text-white shadow transition-all";
+                document.getElementById('btn-tab-start').className = "flex-1 py-2 text-xs font-semibold rounded-xl text-gray-400 hover:text-white transition-all";
+            }
         }
 
         function abortSession() {
@@ -87,20 +154,21 @@
             currentStage = 1;
             document.getElementById('game-modal').classList.remove('hidden');
             
-            // Время на раунд зависит от сложности
-            totalTimeForRound = diff === 1 ? 12 : (diff === 2 ? 8 : 4);
+            totalTimeForTask = diff === 1 ? 10.0 : (diff === 2 ? 6.0 : 3.5);
             startStruopStage();
         }
 
         function startTimer(onTimeoutCallback) {
             clearInterval(roundTimer);
-            timeLeft = totalTimeForRound;
+            timeLeft = totalTimeForTask;
             let bar = document.getElementById('timer-bar');
+            let text = document.getElementById('timer-text');
             
             roundTimer = setInterval(() => {
                 timeLeft -= 0.1;
-                let percent = (timeLeft / totalTimeForRound) * 100;
+                let percent = (timeLeft / totalTimeForTask) * 100;
                 if (bar) bar.style.width = Math.max(0, percent) + '%';
+                if (text) text.innerText = Math.max(0, timeLeft).toFixed(1) + 's';
 
                 if (timeLeft <= 0) {
                     clearInterval(roundTimer);
@@ -109,13 +177,14 @@
             }, 100);
         }
 
-        function showFailScreen(message, retryCallbackName) {
+        // Блокировка и генерация другого задания при ошибке
+        function showFailAndRegenerate(message, regenerateCallback) {
             clearInterval(roundTimer);
             document.getElementById('game-container').innerHTML = `
-                <div class="text-3xl mb-2">❌</div>
-                <h3 class="text-xl font-bold text-red-400 mb-1">Провал раунда!</h3>
-                <p class="text-xs text-gray-300 mb-6">${message}</p>
-                <button onclick="${retryCallbackName}()" class="w-full py-3 bg-red-600 hover:bg-red-500 rounded-2xl font-bold text-white tap-highlight">Попробовать снова</button>
+                <div class="text-4xl mb-2">⛔</div>
+                <h3 class="text-xl font-bold text-red-400 mb-1">Ошибка / Время вышло!</h3>
+                <p class="text-xs text-gray-300 mb-6 leading-relaxed">${message}<br><span class="text-amber-400 font-bold mt-1 block">Генерируем ДРУГОЕ задание...</span></p>
+                <button onclick="${regenerateCallback.name}()" class="w-full py-3.5 bg-red-600 hover:bg-red-500 rounded-2xl font-bold text-white tap-highlight text-sm">Новое задание ➔</button>
             `;
         }
 
@@ -145,23 +214,23 @@
             let colorObj = struopColors[Math.floor(Math.random() * struopColors.length)];
             struopData.targetCode = colorObj.code;
             struopData.targetWord = wordObj.name;
-            struopData.mode = (currentDifficulty >= 2 && struopData.rounds % 2 !== 0) ? 'word' : 'color';
-            let ruleText = struopData.mode === 'color' ? 'цвет чернил' : 'значение слова';
+            struopData.mode = (currentDifficulty >= 2 && Math.random() > 0.5) ? 'word' : 'color';
+            let ruleText = struopData.mode === 'color' ? 'ЦВЕТ ЧЕРНИЛ' : 'ЗНАЧЕНИЕ СЛОВА';
 
             document.getElementById('game-container').innerHTML = `
-                <div class="text-xs text-indigo-400 font-semibold mb-1">Этап 1: Струп (Раунд ${struopData.rounds + 1}/4)</div>
-                <div class="text-xs text-amber-400 font-bold mb-4">⚠️ Выбери: <span class="underline">${ruleText}</span></div>
+                <div class="text-xs text-indigo-400 font-semibold mb-1">Этап 1: Струп (Успешно: ${struopData.rounds}/4)</div>
+                <div class="text-xs text-amber-400 font-bold mb-4">⚠️ Нажимай на: <span class="underline">${ruleText}</span></div>
                 <div class="text-3xl font-black mb-8 tracking-wide" style="color: ${colorObj.code}">${wordObj.name}</div>
                 <div class="grid grid-cols-2 gap-3 w-full">
-                    <button onclick="checkStruop('КРАСНЫЙ', '#ef4444', this)" class="py-3 bg-red-600/20 border border-red-500 rounded-2xl font-bold text-red-400 tap-highlight">Красный</button>
-                    <button onclick="checkStruop('СИНИЙ', '#3b82f6', this)" class="py-3 bg-blue-600/20 border border-blue-500 rounded-2xl font-bold text-blue-400 tap-highlight">Синий</button>
-                    <button onclick="checkStruop('ЗЕЛЕНЫЙ', '#22c55e', this)" class="py-3 bg-emerald-600/20 border border-emerald-500 rounded-2xl font-bold text-emerald-400 tap-highlight">Зеленый</button>
-                    <button onclick="checkStruop('ЖЕЛТЫЙ', '#eab308', this)" class="py-3 bg-amber-600/20 border border-amber-500 rounded-2xl font-bold text-amber-400 tap-highlight">Желтый</button>
+                    <button onclick="checkStruop('КРАСНЫЙ', '#ef4444', this)" class="py-3 bg-red-600/20 border border-red-500 rounded-2xl font-bold text-red-400 tap-highlight active:scale-95">Красный</button>
+                    <button onclick="checkStruop('СИНИЙ', '#3b82f6', this)" class="py-3 bg-blue-600/20 border border-blue-500 rounded-2xl font-bold text-blue-400 tap-highlight active:scale-95">Синий</button>
+                    <button onclick="checkStruop('ЗЕЛЕНЫЙ', '#22c55e', this)" class="py-3 bg-emerald-600/20 border border-emerald-500 rounded-2xl font-bold text-emerald-400 tap-highlight active:scale-95">Зеленый</button>
+                    <button onclick="checkStruop('ЖЕЛТЫЙ', '#eab308', this)" class="py-3 bg-amber-600/20 border border-amber-500 rounded-2xl font-bold text-amber-400 tap-highlight active:scale-95">Желтый</button>
                 </div>
             `;
 
             startTimer(() => {
-                showFailScreen("Время вышло! Тренируй скорость реакции.", "startStruopStage");
+                showFailAndRegenerate("Время на задачу истекло!", nextStruopRound);
             });
         }
 
@@ -173,12 +242,12 @@
                 btn.className = "py-3 bg-emerald-600 border border-emerald-400 rounded-2xl font-bold text-white";
                 struopData.score++;
                 struopData.rounds++;
-                setTimeout(nextStruopRound, 400);
+                setTimeout(nextStruopRound, 300);
             } else {
                 btn.className = "py-3 bg-red-600 border border-red-400 rounded-2xl font-bold text-white";
                 setTimeout(() => {
-                    showFailScreen("Ошибка в тесте Струпа! Не поддавайся на когнитивные ловушки.", "startStruopStage");
-                }, 400);
+                    showFailAndRegenerate("Неверный выбор по правилу!", nextStruopRound);
+                }, 300);
             }
         }
 
@@ -217,34 +286,31 @@
             let i = 0;
             let interval = setInterval(() => {
                 if (i < memData.pattern.length) {
-                    renderMemoryGrid(memData.pattern[i], null, null);
-                    setTimeout(() => { renderMemoryGrid(null, null, null); }, 400);
+                    renderMemoryGrid(memData.pattern[i]);
+                    setTimeout(() => { renderMemoryGrid(null); }, 350);
                     i++;
                 } else {
                     clearInterval(interval);
-                    renderMemoryGrid(null, false, true); // игрок ходит
+                    renderMemoryGrid(null);
                     startTimer(() => {
-                        showFailScreen("Время на запоминание и ввод вышло!", "startMemoryStage");
+                        showFailAndRegenerate("Время на ввод последовательности вышло!", nextMemoryRound);
                     });
                 }
-            }, 700);
+            }, 600);
         }
 
-        function renderMemoryGrid(activeIdx, clickIdx, isCorrectClick) {
+        function renderMemoryGrid(activeIdx) {
             let gridClass = memData.size === 4 ? 'grid-cols-4' : 'grid-cols-3';
             let cellH = memData.size === 4 ? 'h-16' : 'h-20';
             
-            let html = `<div class="text-xs text-indigo-400 font-semibold mb-1">Этап 2: Память (Уровень ${memData.score + 1}/3)</div>
-                        <div class="text-xs text-pink-400 font-bold mb-3">Повтори последовательность</div>
+            let html = `<div class="text-xs text-indigo-400 font-semibold mb-1">Этап 2: Память (Пройдено: ${memData.score}/3)</div>
+                        <div class="text-xs text-pink-400 font-bold mb-3">Запомни и повтори точки</div>
                         <div class="grid ${gridClass} gap-1.5 w-full max-w-[260px] mb-2">`;
             
             let totalCells = memData.size * memData.size;
             for(let i=0; i<totalCells; i++) {
                 let bg = "bg-gray-800 border-gray-700";
-                if (activeIdx === i) bg = "bg-purple-500 border-purple-300 scale-95";
-                if (clickIdx === i) {
-                    bg = isCorrectClick ? "bg-emerald-600 border-emerald-400" : "bg-red-600 border-red-400";
-                }
+                if (activeIdx === i) bg = "bg-purple-500 border-purple-300 scale-95 shadow-lg shadow-purple-500/50";
                 html += `<div onclick="checkMemClick(${i}, this)" class="${cellH} rounded-xl border ${bg} cursor-pointer transition-all tap-highlight"></div>`;
             }
             html += `</div>`;
@@ -261,14 +327,14 @@
                 if (memData.step === memData.pattern.length) {
                     clearInterval(roundTimer);
                     memData.score++;
-                    setTimeout(nextMemoryRound, 800);
+                    setTimeout(nextMemoryRound, 400);
                 }
             } else {
                 clearInterval(roundTimer);
                 el.className = el.className.replace('bg-gray-800 border-gray-700', 'bg-red-600 border-red-400');
                 setTimeout(() => {
-                    showFailScreen("Неверная плитка! Ошибка в пространственной памяти.", "startMemoryStage");
-                }, 400);
+                    showFailAndRegenerate("Ошибка в порядке плиток!", nextMemoryRound);
+                }, 300);
             }
         }
 
@@ -293,8 +359,8 @@
                 do { redIdx = Math.floor(Math.random() * 9); } while (redIdx === greenIdx);
             }
 
-            let html = `<div class="text-xs text-indigo-400 font-semibold mb-1">Этап 3: Реакция (Раунд ${reactData.rounds + 1}/4)</div>
-                        <div class="text-xs text-emerald-400 font-bold mb-3">Жми на Зеленый, избегай Красного!</div>
+            let html = `<div class="text-xs text-indigo-400 font-semibold mb-1">Этап 3: Реакция (Успешно: ${reactData.rounds}/4)</div>
+                        <div class="text-xs text-emerald-400 font-bold mb-3">Жми ЗЕЛЕНЫЙ! Избегай ловушек.</div>
                         <div class="grid grid-cols-3 gap-1.5 w-full max-w-[260px] mb-2">`;
 
             for(let i=0; i<9; i++) {
@@ -309,7 +375,7 @@
             document.getElementById('game-container').innerHTML = html;
 
             startTimer(() => {
-                showFailScreen("Медленно! Время реакции истекло.", "startReactionStage");
+                showFailAndRegenerate("Время реакции истекло!", nextReactRound);
             });
         }
 
@@ -319,16 +385,12 @@
                 el.className = el.className.replace('bg-emerald-600', 'bg-emerald-400');
                 reactData.score++;
                 reactData.rounds++;
-                setTimeout(nextReactRound, 400);
-            } else if (isTrap) {
-                el.className = el.className.replace('bg-red-600', 'bg-red-800');
-                setTimeout(() => {
-                    showFailScreen("Попал в ловушку! Контролируй импульсы.", "startReactionStage");
-                }, 400);
+                setTimeout(nextReactRound, 300);
             } else {
+                el.className = el.className.replace('bg-gray-800', 'bg-red-600').replace('bg-red-600', 'bg-red-800');
                 setTimeout(() => {
-                    showFailScreen("Мимо цели!", "startReactionStage");
-                }, 200);
+                    showFailAndRegenerate("Клик в запрещенную зону!", nextReactRound);
+                }, 300);
             }
         }
 
@@ -346,21 +408,29 @@
                 return;
             }
 
-            let a = Math.floor(Math.random() * 20) + 10;
-            let b = Math.floor(Math.random() * 20) + 10;
-            let ans = a + b;
-            let opts = [ans, ans + 2, ans - 3].sort(() => Math.random() - 0.5);
+            let a = Math.floor(Math.random() * (20 * currentDifficulty)) + 10;
+            let b = Math.floor(Math.random() * (15 * currentDifficulty)) + 5;
+            let op = Math.random() > 0.5 ? '+' : '-';
+            if (op === '-' && b > a) { let tmp = a; a = b; b = tmp; }
+            let ans = op === '+' ? a + b : a - b;
+
+            let wrong1 = ans + (Math.random() > 0.5 ? 3 : -2);
+            let wrong2 = ans + (Math.random() > 0.5 ? 5 : -4);
+            if (wrong1 === ans) wrong1 += 1;
+            if (wrong2 === ans || wrong2 === wrong1) wrong2 += 2;
+
+            let opts = [ans, wrong1, wrong2].sort(() => Math.random() - 0.5);
 
             document.getElementById('game-container').innerHTML = `
-                <div class="text-xs text-indigo-400 font-semibold mb-1">Этап 4: Спринт (Вопрос ${mathData.round + 1}/3)</div>
-                <div class="text-3xl font-black text-white mb-6">${a} + ${b} = ?</div>
+                <div class="text-xs text-indigo-400 font-semibold mb-1">Этап 4: Спринт (Пройдено: ${mathData.round}/3)</div>
+                <div class="text-3xl font-black text-white mb-6">${a} ${op} ${b} = ?</div>
                 <div class="flex flex-col gap-2.5 w-full">
-                    ${opts.map(o => `<button onclick="checkMathAns(${o},${ans}, this)" class="py-3 bg-gray-800 border border-gray-700 rounded-2xl font-bold text-white tap-highlight">${o}</button>`).join('')}
+                    ${opts.map(o => `<button onclick="checkMathAns(${o},${ans}, this)" class="py-3 bg-gray-800 border border-gray-700 rounded-2xl font-bold text-white tap-highlight hover:border-indigo-500">${o}</button>`).join('')}
                 </div>
             `;
 
             startTimer(() => {
-                showFailScreen("Время на арифметику вышло!", "startMathStage");
+                showFailAndRegenerate("Время на арифметику вышло!", nextMathRound);
             });
         }
 
@@ -370,33 +440,53 @@
                 btn.className = "py-3 bg-emerald-600 border border-emerald-400 rounded-2xl font-bold text-white";
                 mathData.score++;
                 mathData.round++;
-                setTimeout(nextMathRound, 400);
+                setTimeout(nextMathRound, 300);
             } else {
                 btn.className = "py-3 bg-red-600 border border-red-400 rounded-2xl font-bold text-white";
                 setTimeout(() => {
-                    showFailScreen("Ошибка в вычислениях!", "startMathStage");
-                }, 400);
+                    showFailAndRegenerate("Неверный расчет примеров!", nextMathRound);
+                }, 300);
             }
         }
 
-        // --- ФИНАЛ ---
+        // --- ФИНАЛ И АНАЛИТИКА ---
         function finishComplexSession() {
             let totalScore = sessionResults.struop + sessionResults.memory + sessionResults.reaction + sessionResults.math;
             let totalXp = totalScore * 15 * currentDifficulty;
             
             userData.xp += totalXp;
+            userData.level = Math.floor(userData.xp / 200) + 1;
+            if (!userData.history) userData.history = [];
+            userData.history.push({ totalScore, totalXp, date: new Date().toLocaleDateString() });
             saveData();
+
+            // Анализ слабых мест
+            let scoresArr = [
+                { name: 'Струп (Гибкость)', val: sessionResults.struop },
+                { name: 'Матрица Памяти', val: sessionResults.memory },
+                { name: 'Реакция & Импульсы', val: sessionResults.reaction },
+                { name: 'Счет & Спринт', val: sessionResults.math }
+            ];
+            scoresArr.sort((a, b) => a.val - b.val);
+            let weakSpot = scoresArr[0].name;
 
             document.getElementById('game-container').innerHTML = `
                 <h3 class="text-2xl font-bold text-white mb-1">🏆 Сессия Пройдена!</h3>
-                <p class="text-xs text-indigo-400 font-semibold mb-4">+${totalXp} XP заработано (Уровень сложности: ${currentDifficulty})</p>
-                <div class="grid grid-cols-2 gap-2 w-full mb-4 text-left text-xs">
+                <p class="text-xs text-indigo-400 font-semibold mb-3">+${totalXp} XP (Сложность: ${currentDifficulty})</p>
+
+                <div class="grid grid-cols-2 gap-2 w-full mb-3 text-left text-xs">
                     <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700">Струп: ${sessionResults.struop}</div>
                     <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700">Память: ${sessionResults.memory}</div>
                     <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700">Реакция: ${sessionResults.reaction}</div>
                     <div class="bg-gray-800/60 p-2.5 rounded-xl border border-gray-700">Счет: ${sessionResults.math}</div>
                 </div>
-                <button onclick="document.getElementById('game-modal').classList.add('hidden')" class="w-full py-3 bg-indigo-600 rounded-2xl font-bold text-white tap-highlight">В меню</button>
+
+                <div class="bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-2xl w-full mb-4 text-left">
+                    <div class="text-[11px] font-bold text-amber-400 mb-0.5">💡 Зона роста:</div>
+                    <p class="text-[10px] text-gray-300">Слабее всего проявилась категория: <span class="font-bold text-white underline">${weakSpot}</span>.</p>
+                </div>
+
+                <button onclick="document.getElementById('game-modal').classList.add('hidden'); switchMenuTab('history');" class="w-full py-3 bg-indigo-600 rounded-2xl font-bold text-white tap-highlight">В историю и меню</button>
             `;
         }
 
