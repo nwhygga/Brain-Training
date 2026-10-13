@@ -22,7 +22,7 @@
                 <div id="user-avatar" class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">Н</div>
                 <div>
                     <h2 id="user-name" class="font-bold text-base text-white">Нейро-Атлет</h2>
-                    <span id="sync-status" class="text-xs text-indigo-400 font-medium">Telegram Active</span>
+                    <span id="sync-status" class="text-xs text-indigo-400 font-medium">Ready</span>
                 </div>
             </div>
             <div class="text-right">
@@ -49,25 +49,25 @@
 
         <!-- Вкладки -->
         <div class="flex bg-gray-800/80 p-1.5 rounded-2xl gap-1 border border-gray-700/50">
-            <button id="btn-tab-games" class="flex-1 py-2 text-sm font-semibold rounded-xl bg-indigo-600 text-white shadow transition-all">Игры</button>
-            <button id="btn-tab-analytics" class="flex-1 py-2 text-sm font-semibold rounded-xl text-gray-400 hover:text-white transition-all">Аналитика</button>
+            <button onclick="switchTab('games')" id="btn-tab-games" class="flex-1 py-2 text-sm font-semibold rounded-xl bg-indigo-600 text-white shadow transition-all">Игры</button>
+            <button onclick="switchTab('analytics')" id="btn-tab-analytics" class="flex-1 py-2 text-sm font-semibold rounded-xl text-gray-400 hover:text-white transition-all">Аналитика</button>
         </div>
 
-        <!-- Список Игры -->
+        <!-- Список Игр -->
         <div id="view-games" class="flex flex-col gap-3">
-            <div id="card-struop" class="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-indigo-500/30 p-4 rounded-2xl cursor-pointer hover:border-indigo-500 transition-all active:scale-95">
+            <div onclick="startStruop()" class="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-indigo-500/30 p-4 rounded-2xl cursor-pointer hover:border-indigo-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Тест Струпа</h3>
                 <p class="text-xs text-gray-300 mt-1">Гибкость мышления & контроль реакций</p>
             </div>
-            <div id="card-memory" class="bg-gradient-to-r from-purple-900/40 to-pink-900/40 border border-purple-500/30 p-4 rounded-2xl cursor-pointer hover:border-purple-500 transition-all active:scale-95">
+            <div onclick="startMemory()" class="bg-gradient-to-r from-purple-900/40 to-pink-900/40 border border-purple-500/30 p-4 rounded-2xl cursor-pointer hover:border-purple-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Матрица Памяти (3x3 ➔ 7x7)</h3>
                 <p class="text-xs text-gray-300 mt-1">Прогрессия с откатами при ошибках</p>
             </div>
-            <div id="card-reaction" class="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-500/30 p-4 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all active:scale-95">
+            <div onclick="startReaction()" class="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-500/30 p-4 rounded-2xl cursor-pointer hover:border-emerald-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Быстрая Реакция</h3>
                 <p class="text-xs text-gray-300 mt-1">Скорость реакции & выбор цели</p>
             </div>
-            <div id="card-math" class="bg-gradient-to-r from-amber-900/40 to-orange-900/40 border border-amber-500/30 p-4 rounded-2xl cursor-pointer hover:border-amber-500 transition-all active:scale-95">
+            <div onclick="startMath()" class="bg-gradient-to-r from-amber-900/40 to-orange-900/40 border border-amber-500/30 p-4 rounded-2xl cursor-pointer hover:border-amber-500 transition-all active:scale-95">
                 <h3 class="font-bold text-white text-lg">Математический Спринт</h3>
                 <p class="text-xs text-gray-300 mt-1">Устный счет & фокус под давлением</p>
             </div>
@@ -88,7 +88,7 @@
     <!-- Модальное окно игры -->
     <div id="game-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
         <div class="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-3xl p-6 flex flex-col items-center text-center relative shadow-2xl">
-            <button id="btn-close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold p-2">✕</button>
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold p-2">✕</button>
             <div id="game-container" class="w-full flex flex-col items-center"></div>
         </div>
     </div>
@@ -97,36 +97,31 @@
         let tg = window.Telegram?.WebApp;
         let userData = { xp: 0, level: 1, streak: 1, history: [] };
 
-        function initApp() {
+        // Инициализация при старте
+        try {
             if (tg) {
-                try {
-                    tg.ready();
-                    tg.expand();
-                    if (tg.initDataUnsafe?.user) {
-                        let user = tg.initDataUnsafe.user;
-                        document.getElementById('user-name').innerText = user.first_name || 'Нейро-Атлет';
-                        if (user.photo_url) {
-                            document.getElementById('user-avatar').innerHTML = `<img src="${user.photo_url}" class="w-full h-full rounded-full object-cover">`;
-                        }
+                tg.ready();
+                tg.expand();
+                if (tg.initDataUnsafe?.user) {
+                    let user = tg.initDataUnsafe.user;
+                    document.getElementById('user-name').innerText = user.first_name || 'Нейро-Атлет';
+                    if (user.photo_url) {
+                        document.getElementById('user-avatar').innerHTML = `<img src="${user.photo_url}" class="w-full h-full rounded-full object-cover">`;
                     }
-                } catch(e) {}
+                }
             }
-            loadData();
-            setupEventListeners();
-            updateUI();
-        }
+        } catch(e) {}
 
-        function loadData() {
-            try {
-                let saved = localStorage.getItem('neuro_flex_data');
-                if (saved) userData = JSON.parse(saved);
-            } catch(e) {}
+        let saved = localStorage.getItem('neuro_flex_data');
+        if (saved) {
+            try { userData = JSON.parse(saved); } catch(e) {}
         }
+        updateUI();
 
         function saveData() {
             try {
                 localStorage.setItem('neuro_flex_data', JSON.stringify(userData));
-                if (tg && tg.CloudStorage && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9')) {
+                if (tg && tg.CloudStorage) {
                     tg.CloudStorage.setItem('neuro_flex_data', JSON.stringify(userData));
                 }
             } catch(e) {}
@@ -155,21 +150,6 @@
                 });
             }
             document.getElementById('history-list').innerHTML = histHTML;
-        }
-
-        function bindClick(id, handler) {
-            let el = document.getElementById(id);
-            if (el) el.addEventListener('click', handler);
-        }
-
-        function setupEventListeners() {
-            bindClick('btn-tab-games', () => switchTab('games'));
-            bindClick('btn-tab-analytics', () => switchTab('analytics'));
-            bindClick('card-struop', startStruop);
-            bindClick('card-memory', startMemory);
-            bindClick('card-reaction', startReaction);
-            bindClick('card-math', startMath);
-            bindClick('btn-close-modal', closeModal);
         }
 
         function switchTab(tab) {
@@ -256,18 +236,8 @@
             nextStruopRound();
         }
 
-        // 2. Матрица Памяти (Прогрессия 3x3 ➔ 7x7 с 3 попытками и откатами)
-        let memData = { 
-            pattern: [], 
-            step: 0, 
-            size: 3, 
-            count: 3, 
-            score: 0, 
-            level: 1, 
-            lives: 3, 
-            isShowing: false, 
-            activeCell: null 
-        };
+        // 2. Матрица Памяти (3x3 ➔ 7x7 с 3 жизнями и откатом)
+        let memData = { pattern: [], step: 0, size: 3, count: 3, score: 0, level: 1, lives: 3, isShowing: false, activeCell: null };
         
         function startMemory() {
             memData = { pattern: [], step: 0, size: 3, count: 3, score: 0, level: 1, lives: 3, isShowing: false, activeCell: null };
@@ -474,5 +444,6 @@
             mathData.rounds++;
             nextMathRound();
         }
-
-        window.addEventListener('DOMContentLoaded', initApp
+    </script>
+</body>
+</html>
